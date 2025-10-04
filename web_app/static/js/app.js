@@ -8,7 +8,82 @@ let featureImportanceChart = null;
 document.addEventListener('DOMContentLoaded', function() {
     loadModelInfo();
     loadFeatureImportance();
+    initSmoothScroll();
+    initScrollSpy();
+    initIntersectionObserver();
 });
+
+// ============================================
+// Smooth Scrolling Navigation
+// ============================================
+function initSmoothScroll() {
+    document.querySelectorAll('.smooth-scroll').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId.startsWith('#')) {
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }
+        });
+    });
+}
+
+// ============================================
+// Navigation Active State (Scroll Spy)
+// ============================================
+function initScrollSpy() {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link.smooth-scroll');
+    
+    window.addEventListener('scroll', () => {
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (scrollY >= (sectionTop - 100)) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.add('active');
+            }
+        });
+    });
+}
+
+// ============================================
+// Intersection Observer for Fade-in Animations
+// ============================================
+function initIntersectionObserver() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            }
+        });
+    }, observerOptions);
+    
+    // Observe feature cards
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.classList.add('fade-in-section');
+        observer.observe(card);
+    });
+}
 
 // Load model information
 async function loadModelInfo() {
@@ -18,31 +93,40 @@ async function loadModelInfo() {
         
         if (data.error) {
             document.getElementById('modelInfo').innerHTML = `
-                <p class="error">❌ ${data.error}</p>
+                <div class="model-info-content">
+                    <span class="info-icon">⚠️</span>
+                    <span>${data.error}</span>
+                </div>
             `;
             return;
         }
         
+        // Update hero stats
+        if (data.accuracy) {
+            document.getElementById('modelAccuracy').textContent = `${(data.accuracy * 100).toFixed(1)}%`;
+        }
+        
+        // Update model info banner
         document.getElementById('modelInfo').innerHTML = `
-            <div class="model-info-grid">
-                <div class="info-item">
-                    <strong>Model:</strong> ${data.model_type.toUpperCase()}
-                </div>
-                <div class="info-item">
-                    <strong>Accuracy:</strong> ${(data.accuracy * 100).toFixed(2)}%
-                </div>
-                <div class="info-item">
-                    <strong>Training Date:</strong> ${new Date(data.training_date).toLocaleDateString()}
-                </div>
-                <div class="info-item">
-                    <strong>Classes:</strong> ${data.classes.join(', ')}
-                </div>
+            <div class="model-info-content">
+                <span class="info-icon">ℹ️</span>
+                <span><strong>Model:</strong> ${data.model_type.toUpperCase()} | 
+                <strong>Accuracy:</strong> ${(data.accuracy * 100).toFixed(2)}% | 
+                <strong>Training Date:</strong> ${new Date(data.training_date).toLocaleDateString()} | 
+                <strong>Classes:</strong> ${data.classes.join(', ')}</span>
             </div>
         `;
+        
+        // Update status badge
+        document.getElementById('modelStatus').innerHTML = '<span class="status-badge status-ready">Ready</span>';
+        
     } catch (error) {
         console.error('Error loading model info:', error);
         document.getElementById('modelInfo').innerHTML = `
-            <p class="error">Failed to load model information</p>
+            <div class="model-info-content">
+                <span class="info-icon">⚠️</span>
+                <span>Failed to load model information</span>
+            </div>
         `;
     }
 }

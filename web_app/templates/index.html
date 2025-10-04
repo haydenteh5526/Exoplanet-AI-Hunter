@@ -4,218 +4,458 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exoplanet AI Hunter - NASA Space Apps 2025</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=4.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <h1>🌟 Exoplanet AI Hunter</h1>
-            <p class="subtitle">NASA Space Apps Challenge 2025</p>
-            <p class="description">Enter astronomical observations to classify exoplanet candidates</p>
-        </header>
+    <!-- Animated Stars Background -->
+    <div class="stars-background">
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+    </div>
 
-        <!-- Model Information -->
-        <div id="modelInfo" class="model-info">
-            <p>Loading model information...</p>
+    <!-- Navigation -->
+    <nav class="nav" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <svg class="logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span class="logo-text">Exoplanet AI</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link smooth-scroll">Home</a>
+                <a href="#features" class="nav-link smooth-scroll">Features</a>
+                <a href="#demo" class="nav-link smooth-scroll">Try Demo</a>
+                <div id="modelStatusNav" class="model-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Model Ready</span>
+                </div>
+            </div>
         </div>
+    </nav>
 
-        <!-- Main Content Grid -->
-        <div class="main-grid">
-            <!-- Input Form -->
-            <div class="input-section">
-                <h2>📊 Enter Exoplanet Features</h2>
-                <p class="info-text">Provide at least 3 features for prediction. More features = better accuracy.</p>
-                <div class="instruction-box">
-                    <strong>⚠️ Important:</strong> If your data includes uncertainty values (e.g., 2.9575±0.0819), 
-                    <strong>enter only the measured value before the ± symbol</strong> (e.g., enter <code>2.9575</code>).
+    <div class="main-container">
+        <!-- SECTION 1: Hero/Landing Section -->
+        <section id="home" class="hero-section section-padding">
+            <div class="hero-content">
+                <div class="badge animate-fadeInUp">NASA Space Apps Challenge 2025</div>
+                <h1 class="hero-title animate-fadeInUp" style="animation-delay: 0.1s">
+                    Discover Exoplanets with
+                    <span class="gradient-text">AI Precision</span>
+                </h1>
+                <p class="hero-description animate-fadeInUp" style="animation-delay: 0.2s">
+                    Harness the power of machine learning to classify astronomical observations from NASA's premier 
+                    exoplanet detection missions. Our AI model, trained on thousands of confirmed discoveries, helps 
+                    distinguish between confirmed exoplanets, candidates, and false positives with remarkable accuracy.
+                </p>
+                <div class="hero-cta animate-fadeInUp" style="animation-delay: 0.3s">
+                    <a href="#demo" class="btn btn-primary btn-lg smooth-scroll">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        Start Classification
+                    </a>
+                    <a href="#features" class="btn btn-secondary btn-lg smooth-scroll">
+                        Learn More
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+                <div class="hero-stats animate-fadeInUp" style="animation-delay: 0.4s">
+                    <div class="stat-item">
+                        <div class="stat-value" id="trainingSamples">9,487</div>
+                        <div class="stat-label">Training Samples</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="modelAccuracy">73.7%</div>
+                        <div class="stat-label">Model Accuracy</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">NASA Missions</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Features Section -->
+        <section id="features" class="features-section section-padding">
+            <div class="section-header">
+                <div class="badge">Capabilities</div>
+                <h2 class="section-title">Powered by Advanced Machine Learning</h2>
+                <p class="section-description">
+                    Our platform combines cutting-edge AI technology with NASA's extensive exoplanet database 
+                    to provide accurate, reliable classifications.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Multi-Mission Training</h3>
+                    <p class="feature-description">
+                        Trained on data from Kepler, K2, and TESS missions, covering over 9,000 confirmed 
+                        exoplanets and candidates for comprehensive learning.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Random Forest Algorithm</h3>
+                    <p class="feature-description">
+                        Utilizes an ensemble of decision trees for robust predictions, reducing overfitting 
+                        and providing reliable confidence scores.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                            <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                            <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Intelligent Matching</h3>
+                    <p class="feature-description">
+                        Automatically finds similar exoplanets in our database, providing context and 
+                        comparison data for your observations.
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Real-Time Analysis</h3>
+                    <p class="feature-description">
+                        Get instant classifications with confidence scores and detailed probability 
+                        breakdowns for each possible disposition.
+                    </p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"></path>
+                            <path d="m19 9-5 5-4-4-3 3"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Visual Insights</h3>
+                    <p class="feature-description">
+                        Interactive charts display probability distributions and feature importance, 
+                        helping you understand model decisions.
+                    </p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Quality Validation</h3>
+                    <p class="feature-description">
+                        Built-in data quality checks ensure meaningful predictions, requiring minimum 
+                        feature thresholds for reliable results.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Model Info Banner -->
+            <div id="modelInfo" class="model-info-banner">
+                <div class="model-info-content">
+                    <span class="info-icon">ℹ️</span>
+                    <span>Loading model information...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Demo/Input Section -->
+        <section id="demo" class="demo-section section-padding">
+            <div class="section-header">
+                <div class="badge">Try it Now</div>
+                <h2 class="section-title">Classify Your Observations</h2>
+                <p class="section-description">
+                    Enter astronomical observation data to get an instant AI-powered classification.
+                </p>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="content-grid">
+            <!-- Input Section -->
+            <div class="input-card">
+                <div class="card-header">
+                    <div class="card-title-group">
+                        <h2 class="card-title">Configure Parameters</h2>
+                        <p class="card-description">Enter astronomical observation data for classification</p>
+                    </div>
+                </div>
+
+                <div class="instruction-callout">
+                    <svg class="callout-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <div class="callout-content">
+                        <strong>Data Entry Guide:</strong> If your data includes uncertainty (e.g., 2.9575±0.0819), 
+                        enter only the measured value: <code>2.9575</code>
+                    </div>
                 </div>
                 
-                <form id="predictionForm">
+                <form id="predictionForm" class="input-form">
                     <!-- Orbital Period -->
-                    <div class="form-group">
-                        <label for="orbital_period">
-                            Orbital Period (days)
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Time taken for one complete orbit around the star. Enter only the measured value (e.g., if data shows 1.74±0.01, enter 1.74)</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="orbital_period" class="input-label">
+                            <span>Orbital Period</span>
+                            <span class="label-unit">days</span>
                         </label>
                         <input type="number" id="orbital_period" name="orbital_period" 
-                               step="any" placeholder="e.g., 1.736952453">
+                               class="input-field" step="any" placeholder="1.736952453">
+                        <p class="input-hint">Time for one complete orbit around the star</p>
                     </div>
 
                     <!-- Transit Duration -->
-                    <div class="form-group">
-                        <label for="transit_duration">
-                            Transit Duration (hours)
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Time the planet takes to cross the star's disk. Enter only the measured value (e.g., if data shows 2.96±0.08, enter 2.96)</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="transit_duration" class="input-label">
+                            <span>Transit Duration</span>
+                            <span class="label-unit">hours</span>
                         </label>
                         <input type="number" id="transit_duration" name="transit_duration" 
-                               step="any" placeholder="e.g., 2.9575">
+                               class="input-field" step="any" placeholder="2.9575">
+                        <p class="input-hint">Time to cross the star's disk</p>
                     </div>
 
                     <!-- Planetary Radius -->
-                    <div class="form-group">
-                        <label for="planetary_radius">
-                            Planetary Radius (Earth radii)
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Size of the planet relative to Earth</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="planetary_radius" class="input-label">
+                            <span>Planetary Radius</span>
+                            <span class="label-unit">Earth radii</span>
                         </label>
                         <input type="number" id="planetary_radius" name="planetary_radius" 
-                               step="any" placeholder="e.g., 1.234567">
+                               class="input-field" step="any" placeholder="1.234567">
+                        <p class="input-hint">Size relative to Earth</p>
                     </div>
 
                     <!-- Stellar Magnitude -->
-                    <div class="form-group">
-                        <label for="stellar_magnitude">
-                            Stellar Magnitude
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Apparent brightness of the host star</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="stellar_magnitude" class="input-label">
+                            <span>Stellar Magnitude</span>
                         </label>
                         <input type="number" id="stellar_magnitude" name="stellar_magnitude" 
-                               step="any" placeholder="e.g., 15.313">
+                               class="input-field" step="any" placeholder="15.313">
+                        <p class="input-hint">Apparent brightness of the host star</p>
                     </div>
 
                     <!-- Transit Depth -->
-                    <div class="form-group">
-                        <label for="transit_depth">
-                            Transit Depth (ppm)
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Decrease in star brightness during transit (parts per million)</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="transit_depth" class="input-label">
+                            <span>Transit Depth</span>
+                            <span class="label-unit">ppm</span>
                         </label>
                         <input type="number" id="transit_depth" name="transit_depth" 
-                               step="any" placeholder="e.g., 2089.0">
+                               class="input-field" step="any" placeholder="2089.0">
+                        <p class="input-hint">Decrease in star brightness during transit</p>
                     </div>
 
                     <!-- Impact Parameter -->
-                    <div class="form-group">
-                        <label for="impact_parameter">
-                            Impact Parameter
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Projected distance between planet and star center (0-1)</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="impact_parameter" class="input-label">
+                            <span>Impact Parameter</span>
                         </label>
                         <input type="number" id="impact_parameter" name="impact_parameter" 
-                               step="any" placeholder="e.g., 0.21">
+                               class="input-field" step="any" placeholder="0.21">
+                        <p class="input-hint">Distance between planet and star center (0-1)</p>
                     </div>
 
                     <!-- Equilibrium Temperature -->
-                    <div class="form-group">
-                        <label for="equilibrium_temperature">
-                            Equilibrium Temperature (K)
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Expected temperature based on stellar radiation</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="equilibrium_temperature" class="input-label">
+                            <span>Equilibrium Temperature</span>
+                            <span class="label-unit">K</span>
                         </label>
                         <input type="number" id="equilibrium_temperature" name="equilibrium_temperature" 
-                               step="any" placeholder="e.g., 1500.5">
+                               class="input-field" step="any" placeholder="1500.5">
+                        <p class="input-hint">Expected temperature based on stellar radiation</p>
                     </div>
 
                     <!-- Insolation Flux -->
-                    <div class="form-group">
-                        <label for="insolation_flux">
-                            Insolation Flux (Earth flux)
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Amount of stellar energy received</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="insolation_flux" class="input-label">
+                            <span>Insolation Flux</span>
+                            <span class="label-unit">Earth flux</span>
                         </label>
                         <input type="number" id="insolation_flux" name="insolation_flux" 
-                               step="any" placeholder="e.g., 100.5">
+                               class="input-field" step="any" placeholder="100.5">
+                        <p class="input-hint">Amount of stellar energy received</p>
                     </div>
 
                     <!-- Stellar Surface Gravity -->
-                    <div class="form-group">
-                        <label for="stellar_surface_gravity">
-                            Stellar Surface Gravity (log g)
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Surface gravity of the host star</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="stellar_surface_gravity" class="input-label">
+                            <span>Stellar Surface Gravity</span>
+                            <span class="label-unit">log g</span>
                         </label>
                         <input type="number" id="stellar_surface_gravity" name="stellar_surface_gravity" 
-                               step="any" placeholder="e.g., 4.437">
+                               class="input-field" step="any" placeholder="4.437">
+                        <p class="input-hint">Surface gravity of the host star</p>
                     </div>
 
                     <!-- Stellar Radius -->
-                    <div class="form-group">
-                        <label for="stellar_radius">
-                            Stellar Radius (Solar radii)
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Size of the host star relative to our Sun</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="stellar_radius" class="input-label">
+                            <span>Stellar Radius</span>
+                            <span class="label-unit">Solar radii</span>
                         </label>
                         <input type="number" id="stellar_radius" name="stellar_radius" 
-                               step="any" placeholder="e.g., 1.012345">
+                               class="input-field" step="any" placeholder="1.012345">
+                        <p class="input-hint">Size of host star relative to our Sun</p>
                     </div>
 
                     <!-- Stellar Mass -->
-                    <div class="form-group">
-                        <label for="stellar_mass">
-                            Stellar Mass (Solar masses)
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Mass of the host star relative to our Sun</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="stellar_mass" class="input-label">
+                            <span>Stellar Mass</span>
+                            <span class="label-unit">Solar masses</span>
                         </label>
                         <input type="number" id="stellar_mass" name="stellar_mass" 
-                               step="any" placeholder="e.g., 1.023456">
+                               class="input-field" step="any" placeholder="1.023456">
+                        <p class="input-hint">Mass of host star relative to our Sun</p>
                     </div>
 
                     <!-- Stellar Metallicity -->
-                    <div class="form-group">
-                        <label for="stellar_metallicity">
-                            Stellar Metallicity [Fe/H]
-                            <span class="tooltip">ⓘ
-                                <span class="tooltiptext">Metal content of the star compared to the Sun</span>
-                            </span>
+                    <div class="input-group">
+                        <label for="stellar_metallicity" class="input-label">
+                            <span>Stellar Metallicity</span>
+                            <span class="label-unit">[Fe/H]</span>
                         </label>
                         <input type="number" id="stellar_metallicity" name="stellar_metallicity" 
-                               step="any" placeholder="e.g., 0.123">
+                               class="input-field" step="any" placeholder="0.123">
+                        <p class="input-hint">Metal content compared to the Sun</p>
                     </div>
 
                     <!-- Buttons -->
-                    <div class="button-group">
-                        <button type="submit" class="btn-primary">
-                            🔍 Classify Exoplanet
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                            Classify Exoplanet
                         </button>
-                        <button type="button" class="btn-secondary" onclick="resetForm()">
-                            🔄 Reset Form
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="1 4 1 10 7 10"></polyline>
+                                <polyline points="23 20 23 14 17 14"></polyline>
+                                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                            </svg>
+                            Reset
                         </button>
                     </div>
                 </form>
             </div>
 
             <!-- Results Section -->
-            <div class="results-section">
-                <h2>📈 Prediction Results</h2>
+            <div class="results-card">
+                <div class="card-header">
+                    <div class="card-title-group">
+                        <h2 class="card-title">Classification Results</h2>
+                        <p class="card-description">AI-powered exoplanet detection analysis</p>
+                    </div>
+                </div>
                 
                 <!-- Results will be displayed here -->
                 <div id="results" class="results-placeholder">
-                    <p>👆 Enter features and click "Classify Exoplanet" to see results</p>
+                    <div class="empty-state">
+                        <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 6v6l4 2"></path>
+                        </svg>
+                        <h3>Awaiting Classification</h3>
+                        <p>Enter at least 3 features and submit to see results</p>
+                    </div>
                 </div>
 
                 <!-- Probability Chart -->
-                <div id="chartContainer" class="chart-container" style="display: none;">
-                    <h3>Class Probabilities</h3>
-                    <canvas id="probabilityChart"></canvas>
+                <div id="chartContainer" class="chart-section" style="display: none;">
+                    <h3 class="chart-title">Class Probabilities</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="probabilityChart"></canvas>
+                    </div>
                 </div>
 
                 <!-- Feature Importance Chart -->
-                <div id="featureImportanceContainer" class="chart-container" style="display: none;">
-                    <h3>Feature Importance</h3>
-                    <canvas id="featureImportanceChart"></canvas>
+                <div id="featureImportanceContainer" class="chart-section" style="display: none;">
+                    <h3 class="chart-title">Feature Importance</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="featureImportanceChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
-        <footer>
-            <p>NASA Space Apps Challenge 2025 | Exoplanet AI Hunter</p>
-            <p>Data from NASA Exoplanet Archive (Kepler, K2, TESS)</p>
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <svg class="footer-logo" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>Exoplanet AI Hunter</span>
+                    </div>
+                    <p class="footer-text">NASA Space Apps Challenge 2025</p>
+                </div>
+                <div class="footer-section">
+                    <p class="footer-label">Data Sources</p>
+                    <p class="footer-text">NASA Exoplanet Archive · Kepler · K2 · TESS</p>
+                </div>
+                <div class="footer-section">
+                    <p class="footer-label">Model Info</p>
+                    <p class="footer-text">Random Forest Classifier · 73.7% Accuracy</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Built with AI for the discovery of exoplanets</p>
+            </div>
         </footer>
     </div>
 
