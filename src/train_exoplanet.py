@@ -93,8 +93,8 @@ def read_nasa_table(path: Path) -> pd.DataFrame:
 
 # ---------- Label builders per mission ----------
 
-def add_label_kepler(df: pd.DataFrame) -> pd.DataFrame:
-    cols = {c.lower(): c for c in df.columns}
+def add_label_kepler(df: pd.DataFrame) -> pd.DataFrame: ## problem with this is it adds a new column to the data csv to say "Exoplanet" or "Not": to narrow it down to 2 options
+    cols = {c.lower(): c for c in df.columns} ##could be avoided if we just made the panda pd read csv ignore case
     if "koi_disposition" not in cols:
         raise ValueError("Kepler file missing 'koi_disposition'")
     col = cols["koi_disposition"]
@@ -180,7 +180,7 @@ def compute_metrics(y_true, y_prob, thresh=0.5):
 def main():
     ap = argparse.ArgumentParser(description="Train exoplanet classifier on Kepler+K2+TESS NASA tables.")
     ap.add_argument("--data", nargs=3, required=True,
-                    help="Paths to the three files: cumulative.csv (Kepler), k2_pandas.csv (K2), TOI.csv (TESS)")
+                    help="Paths to the three files: cumulative.csv (Kepler), k2_pandas.csv (K2), TOI.csv (TESS)") ## should automatically read, the user isnt going to input this
     ap.add_argument("--outdir", required=True, help="Directory to write artifacts")
     ap.add_argument("--seed", type=int, default=42)
     args = ap.parse_args()
