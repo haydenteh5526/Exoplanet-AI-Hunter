@@ -1,0 +1,21 @@
+{
+  "model_type": "random_forest",
+  "feature_names": [
+    "orbital_period",
+    "transit_duration",
+    "planetary_radius",
+    "stellar_magnitude",
+    "transit_depth",
+    "impact_parameter",
+    "equilibrium_temperature",
+    "stellar_radius",
+    "stellar_mass"
+  ],
+  "class_names": [
+    "CANDIDATE",
+    "CONFIRMED",
+    "FALSE_POSITIVE"
+  ],
+  "timestamp": "2025-10-04T14:51:47",
+  "accuracy": 0.7366
+}

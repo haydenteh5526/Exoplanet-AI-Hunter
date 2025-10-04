@@ -1,0 +1,70 @@
+{
+  "kepler_227_b": {
+    "description": "Confirmed exoplanet in the Kepler catalog",
+    "features": {
+      "orbital_period": 9.48803557,
+      "transit_duration": 2.96,
+      "planetary_radius": 2.26,
+      "stellar_magnitude": 15.313,
+      "transit_depth": 2089.0,
+      "impact_parameter": 0.21,
+      "equilibrium_temperature": 801.0,
+      "stellar_radius": 0.88,
+      "stellar_mass": 0.87
+    },
+    "expected_result": "CONFIRMED",
+    "notes": "Original NASA data: orbital_period = 9.48803557±2.775e-05 days"
+  },
+  "kepler_example_1": {
+    "description": "Example from Kepler mission with high precision",
+    "features": {
+      "orbital_period": 1.736952453,
+      "transit_duration": 2.541667,
+      "planetary_radius": 1.234567,
+      "stellar_magnitude": 14.567,
+      "transit_depth": 1234.5,
+      "impact_parameter": 0.456,
+      "equilibrium_temperature": 1234.5,
+      "stellar_radius": 1.012345,
+      "stellar_mass": 1.023456
+    },
+    "expected_result": "CONFIRMED or CANDIDATE",
+    "notes": "Original NASA data: orbital_period = 1.736952453±2.63e-07 days - Ultra-high precision measurement"
+  },
+  "earth_like_candidate": {
+    "description": "Earth-like exoplanet candidate",
+    "features": {
+      "orbital_period": 365.25,
+      "planetary_radius": 1.0,
+      "equilibrium_temperature": 288.0,
+      "stellar_radius": 1.0,
+      "stellar_mass": 1.0
+    },
+    "expected_result": "CANDIDATE",
+    "notes": "Minimum 3 features - Earth-like parameters"
+  },
+  "hot_jupiter": {
+    "description": "Hot Jupiter type exoplanet",
+    "features": {
+      "orbital_period": 3.5,
+      "planetary_radius": 11.2,
+      "equilibrium_temperature": 1500.0,
+      "stellar_radius": 1.2,
+      "stellar_mass": 1.1
+    },
+    "expected_result": "CONFIRMED or CANDIDATE",
+    "notes": "Large gas giant orbiting close to its star"
+  },
+  "super_earth": {
+    "description": "Super-Earth type exoplanet",
+    "features": {
+      "orbital_period": 12.5,
+      "planetary_radius": 1.8,
+      "equilibrium_temperature": 450.0,
+      "stellar_radius": 0.95,
+      "stellar_mass": 0.9
+    },
+    "expected_result": "CANDIDATE",
+    "notes": "Larger than Earth but smaller than Neptune"
+  }
+}

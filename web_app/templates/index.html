@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exoplanet AI Hunter - NASA Space Apps 2025</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🌟 Exoplanet AI Hunter</h1>
+            <p class="subtitle">NASA Space Apps Challenge 2025</p>
+            <p class="description">Enter astronomical observations to classify exoplanet candidates</p>
+        </header>
+
+        <!-- Model Information -->
+        <div id="modelInfo" class="model-info">
+            <p>Loading model information...</p>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Input Form -->
+            <div class="input-section">
+                <h2>📊 Enter Exoplanet Features</h2>
+                <p class="info-text">Provide at least 3 features for prediction. More features = better accuracy.</p>
+                <div class="instruction-box">
+                    <strong>⚠️ Important:</strong> If your data includes uncertainty values (e.g., 2.9575±0.0819), 
+                    <strong>enter only the measured value before the ± symbol</strong> (e.g., enter <code>2.9575</code>).
+                </div>
+                
+                <form id="predictionForm">
+                    <!-- Orbital Period -->
+                    <div class="form-group">
+                        <label for="orbital_period">
+                            Orbital Period (days)
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Time taken for one complete orbit around the star. Enter only the measured value (e.g., if data shows 1.74±0.01, enter 1.74)</span>
+                            </span>
+                        </label>
+                        <input type="number" id="orbital_period" name="orbital_period" 
+                               step="any" placeholder="e.g., 1.736952453">
+                    </div>
+
+                    <!-- Transit Duration -->
+                    <div class="form-group">
+                        <label for="transit_duration">
+                            Transit Duration (hours)
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Time the planet takes to cross the star's disk. Enter only the measured value (e.g., if data shows 2.96±0.08, enter 2.96)</span>
+                            </span>
+                        </label>
+                        <input type="number" id="transit_duration" name="transit_duration" 
+                               step="any" placeholder="e.g., 2.9575">
+                    </div>
+
+                    <!-- Planetary Radius -->
+                    <div class="form-group">
+                        <label for="planetary_radius">
+                            Planetary Radius (Earth radii)
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Size of the planet relative to Earth</span>
+                            </span>
+                        </label>
+                        <input type="number" id="planetary_radius" name="planetary_radius" 
+                               step="any" placeholder="e.g., 1.234567">
+                    </div>
+
+                    <!-- Stellar Magnitude -->
+                    <div class="form-group">
+                        <label for="stellar_magnitude">
+                            Stellar Magnitude
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Apparent brightness of the host star</span>
+                            </span>
+                        </label>
+                        <input type="number" id="stellar_magnitude" name="stellar_magnitude" 
+                               step="any" placeholder="e.g., 15.313">
+                    </div>
+
+                    <!-- Transit Depth -->
+                    <div class="form-group">
+                        <label for="transit_depth">
+                            Transit Depth (ppm)
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Decrease in star brightness during transit (parts per million)</span>
+                            </span>
+                        </label>
+                        <input type="number" id="transit_depth" name="transit_depth" 
+                               step="any" placeholder="e.g., 2089.0">
+                    </div>
+
+                    <!-- Impact Parameter -->
+                    <div class="form-group">
+                        <label for="impact_parameter">
+                            Impact Parameter
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Projected distance between planet and star center (0-1)</span>
+                            </span>
+                        </label>
+                        <input type="number" id="impact_parameter" name="impact_parameter" 
+                               step="any" placeholder="e.g., 0.21">
+                    </div>
+
+                    <!-- Equilibrium Temperature -->
+                    <div class="form-group">
+                        <label for="equilibrium_temperature">
+                            Equilibrium Temperature (K)
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Expected temperature based on stellar radiation</span>
+                            </span>
+                        </label>
+                        <input type="number" id="equilibrium_temperature" name="equilibrium_temperature" 
+                               step="any" placeholder="e.g., 1500.5">
+                    </div>
+
+                    <!-- Insolation Flux -->
+                    <div class="form-group">
+                        <label for="insolation_flux">
+                            Insolation Flux (Earth flux)
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Amount of stellar energy received</span>
+                            </span>
+                        </label>
+                        <input type="number" id="insolation_flux" name="insolation_flux" 
+                               step="any" placeholder="e.g., 100.5">
+                    </div>
+
+                    <!-- Stellar Surface Gravity -->
+                    <div class="form-group">
+                        <label for="stellar_surface_gravity">
+                            Stellar Surface Gravity (log g)
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Surface gravity of the host star</span>
+                            </span>
+                        </label>
+                        <input type="number" id="stellar_surface_gravity" name="stellar_surface_gravity" 
+                               step="any" placeholder="e.g., 4.437">
+                    </div>
+
+                    <!-- Stellar Radius -->
+                    <div class="form-group">
+                        <label for="stellar_radius">
+                            Stellar Radius (Solar radii)
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Size of the host star relative to our Sun</span>
+                            </span>
+                        </label>
+                        <input type="number" id="stellar_radius" name="stellar_radius" 
+                               step="any" placeholder="e.g., 1.012345">
+                    </div>
+
+                    <!-- Stellar Mass -->
+                    <div class="form-group">
+                        <label for="stellar_mass">
+                            Stellar Mass (Solar masses)
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Mass of the host star relative to our Sun</span>
+                            </span>
+                        </label>
+                        <input type="number" id="stellar_mass" name="stellar_mass" 
+                               step="any" placeholder="e.g., 1.023456">
+                    </div>
+
+                    <!-- Stellar Metallicity -->
+                    <div class="form-group">
+                        <label for="stellar_metallicity">
+                            Stellar Metallicity [Fe/H]
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">Metal content of the star compared to the Sun</span>
+                            </span>
+                        </label>
+                        <input type="number" id="stellar_metallicity" name="stellar_metallicity" 
+                               step="any" placeholder="e.g., 0.123">
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">
+                            🔍 Classify Exoplanet
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="resetForm()">
+                            🔄 Reset Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <h2>📈 Prediction Results</h2>
+                
+                <!-- Results will be displayed here -->
+                <div id="results" class="results-placeholder">
+                    <p>👆 Enter features and click "Classify Exoplanet" to see results</p>
+                </div>
+
+                <!-- Probability Chart -->
+                <div id="chartContainer" class="chart-container" style="display: none;">
+                    <h3>Class Probabilities</h3>
+                    <canvas id="probabilityChart"></canvas>
+                </div>
+
+                <!-- Feature Importance Chart -->
+                <div id="featureImportanceContainer" class="chart-container" style="display: none;">
+                    <h3>Feature Importance</h3>
+                    <canvas id="featureImportanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>NASA Space Apps Challenge 2025 | Exoplanet AI Hunter</p>
+            <p>Data from NASA Exoplanet Archive (Kepler, K2, TESS)</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
