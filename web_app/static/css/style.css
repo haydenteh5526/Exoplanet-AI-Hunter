@@ -1,26 +1,126 @@
 /* Space Theme */
+@keyframes floating {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(13, 13, 48, 0.9);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #4a4a8f, #2d2d6d);
+    border-radius: 10px;
+    border: 2px solid rgba(13, 13, 48, 0.9);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #5a5aa0, #3d3d7d);
+}
+
 .space-theme {
-    background: linear-gradient(to bottom, #0B0B2B, #1A1A3A);
+    background: linear-gradient(125deg, #0B0B2B, #1A1A3A, #2A2A4A, #1A1A3A);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    position: relative;
     color: #fff;
     min-height: 100vh;
+    overflow-y: auto;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Enhance text with gradients */
+h1, h2, h3 {
+    background: linear-gradient(90deg, #fff, #4A90E2, #fff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: titleGlow 8s ease infinite;
+}
+
+@keyframes titleGlow {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(74, 144, 226, 0.5)); }
+    50% { filter: drop-shadow(0 0 15px rgba(74, 144, 226, 0.8)); }
 }
 
 /* Cosmic Navigation */
 .cosmic-nav {
     background: rgba(10, 10, 40, 0.95);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(74, 144, 226, 0.3);
+    box-shadow: 0 2px 20px rgba(74, 144, 226, 0.1);
+}
+
+.cosmic-nav .navbar-brand {
+    position: relative;
+    padding: 5px 15px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.cosmic-nav .navbar-brand::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(74, 144, 226, 0.2),
+        transparent
+    );
+    transition: 0.5s;
+}
+
+.cosmic-nav .navbar-brand:hover::before {
+    left: 100%;
 }
 
 /* Hero Section */
 .hero-section {
-    background: url('../images/space-bg.jpg') center/cover;
+    background: radial-gradient(circle at center, #1a237e, #0d1321);
     position: relative;
     overflow: hidden;
     min-height: 100vh;
     display: flex;
     align-items: center;
     padding-top: 80px;
+}
+
+.hero-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='1' fill='%23ffffff' fill-opacity='0.3'/%3E%3C/svg%3E");
+    animation: twinkling 3s infinite;
+    pointer-events: none;
+}
+
+.hero-section h1 {
+    text-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+    animation: glow 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% { text-shadow: 0 0 10px rgba(74, 144, 226, 0.5); }
+    50% { text-shadow: 0 0 20px rgba(74, 144, 226, 0.8), 0 0 30px rgba(74, 144, 226, 0.6); }
 }
 
 .hero-section::before {
@@ -40,12 +140,28 @@
 
 /* Cosmic Search */
 .cosmic-search {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
+    background: rgba(13, 13, 48, 0.9);
+    border: 2px solid rgba(74, 144, 226, 0.5);
+    color: #ffffff;
+    font-weight: 500;
     border-radius: 30px;
     padding: 15px 25px;
     transition: all 0.3s ease;
+    box-shadow: 
+        0 0 15px rgba(74, 144, 226, 0.1),
+        inset 0 0 10px rgba(74, 144, 226, 0.1);
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.cosmic-search::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: normal;
+}
+
+.cosmic-search:focus {
+    background: rgba(20, 20, 60, 0.95);
+    border-color: rgba(74, 144, 226, 0.8);
+    color: #ffffff;
 }
 
 .cosmic-search:focus {
@@ -82,23 +198,111 @@
 .range-value {
     color: #4A90E2;
     font-size: 0.9em;
-    margin-top: 5px;
-    display: block;
+}
+
+/* Select and Options Styling */
+.cosmic-select {
+    background: rgba(13, 13, 48, 0.95);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 8px 12px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.cosmic-select:focus {
+    background: rgba(20, 20, 60, 0.95);
+    border-color: rgba(74, 144, 226, 0.8);
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);
+    outline: none;
+}
+
+.cosmic-select option {
+    background: rgba(13, 13, 48, 0.95);
+    color: #ffffff;
+    padding: 10px;
+}
+
+/* Visualization Container */
+#vizContainer {
+    background: rgba(13, 13, 48, 0.95);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    height: 600px;
+    margin-top: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.viz-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.viz-controls .btn {
+    background: rgba(74, 144, 226, 0.2);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    color: #ffffff;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.viz-controls .btn:hover {
+    background: rgba(74, 144, 226, 0.3);
+    border-color: rgba(74, 144, 226, 0.5);
+}
+
+.viz-controls .btn.active {
+    background: rgba(74, 144, 226, 0.4);
+    border-color: rgba(74, 144, 226, 0.8);
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);
 }
 
 /* Exoplanet Cards */
 .exoplanet-card {
-    background: rgba(30, 30, 60, 0.95);
+    background: linear-gradient(145deg, rgba(30, 30, 60, 0.95), rgba(40, 40, 80, 0.95));
     border-radius: 15px;
     padding: 20px;
     margin-bottom: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.4s ease;
     cursor: pointer;
+    border: 1px solid rgba(74, 144, 226, 0.2);
+    box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.3),
+        inset 0 0 20px rgba(74, 144, 226, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.exoplanet-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(74, 144, 226, 0.2),
+        transparent
+    );
+    transition: 0.5s;
 }
 
 .exoplanet-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(74, 144, 226, 0.2),
+                0 0 20px rgba(74, 144, 226, 0.2),
+                0 0 40px rgba(74, 144, 226, 0.1);
+    border-color: rgba(74, 144, 226, 0.5);
+}
+
+.exoplanet-card:hover::before {
+    left: 100%;
 }
 
 .exoplanet-card h3 {
@@ -190,13 +394,22 @@
 
 /* Planet Parameters */
 .parameter-badge {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(74, 144, 226, 0.1);
+    border: 1px solid rgba(74, 144, 226, 0.3);
     border-radius: 20px;
     padding: 5px 15px;
     margin: 5px;
     display: inline-block;
     font-size: 0.9em;
     color: #4A90E2;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.parameter-badge:hover {
+    background: rgba(74, 144, 226, 0.2);
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+    transform: translateY(-2px);
 }
 
 .parameter-badge i {
@@ -206,6 +419,7 @@
 /* Habitability Score */
 .habitability-score {
     background: linear-gradient(90deg, #e74c3c, #f1c40f, #2ecc71);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 1.2em;
@@ -272,19 +486,53 @@
 }
 
 /* Button Styles */
+/* Cosmic Buttons */
 .btn-outline-primary {
     color: #4A90E2;
-    border-color: #4A90E2;
+    border: 1px solid rgba(74, 144, 226, 0.5);
+    background: rgba(74, 144, 226, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.btn-outline-primary::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(74, 144, 226, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
 }
 
 .btn-outline-primary:hover,
 .btn-outline-primary.active {
-    background-color: #4A90E2;
     color: #fff;
+    border-color: rgba(74, 144, 226, 0.8);
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary:hover::before,
+.btn-outline-primary.active::before {
+    width: 300px;
+    height: 300px;
 }
 
 /* Star Type Buttons */
 .btn-group .btn {
     flex: 1;
-    padding: 5px;
+    padding: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.btn-group .btn span {
+    position: relative;
+    z-index: 2;
 }

@@ -257,6 +257,101 @@ function setupSearch() {
 }
 
 // Initialize animations
+// Initialize visualizations
+function initializeVisualizations() {
+    // Call this function after data is loaded
+    const vizContainer = document.getElementById('vizContainer');
+    const vizButtons = document.querySelectorAll('.viz-controls button');
+    
+    // Set initial visualization
+    setTimeout(() => {
+        const firstButton = document.querySelector('.viz-controls button[data-viz="scatter"]');
+        if (firstButton) {
+            firstButton.classList.add('active');
+            updateVisualization('scatter');
+        }
+    }, 1000); // Wait for data to load
+
+    vizButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            // Remove active class from all buttons
+            vizButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            e.target.classList.add('active');
+            
+            const vizType = e.target.getAttribute('data-viz');
+            updateVisualization(vizType);
+        });
+    });
+}
+
+function updateVisualization(vizType) {
+    const vizContainer = document.getElementById('vizContainer');
+    
+    if (!exoplanets || exoplanets.length === 0) {
+        vizContainer.innerHTML = 'Loading data...';
+        return;
+    }
+    
+    switch(vizType) {
+        case 'scatter':
+            // Mass vs Radius scatter plot
+            const trace = {
+                x: exoplanets.map(p => p.mass || 0), // Mass in Earth masses
+                y: exoplanets.map(p => p.radius || 0), // Radius in Earth radii
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    size: 8,
+                    color: exoplanets.map(p => p.temperature || 0), // Temperature in Kelvin
+                    colorscale: 'Viridis',
+                    showscale: true,
+                    colorbar: {
+                        title: 'Temperature (K)',
+                        titlefont: { color: '#fff' },
+                        tickfont: { color: '#fff' }
+                    }
+                },
+                text: exoplanets.map(p => p.name || 'Unknown'),
+                hovertemplate: 
+                    '<b>%{text}</b><br>' +
+                    'Mass: %{x:.2f} M⊕<br>' +
+                    'Radius: %{y:.2f} R⊕<br>' +
+                    'Temp: %{marker.color:.0f}K<br>' +
+                    '<extra></extra>'
+            };
+            
+            const layout = {
+                title: 'Exoplanet Mass vs Radius',
+                xaxis: {
+                    title: 'Mass (Earth Masses)',
+                    type: 'log',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    zerolinecolor: 'rgba(255,255,255,0.1)'
+                },
+                yaxis: {
+                    title: 'Radius (Earth Radii)',
+                    type: 'log',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    zerolinecolor: 'rgba(255,255,255,0.1)'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: {
+                    color: '#fff'
+                },
+                showlegend: false
+            };
+            
+            Plotly.newPlot(vizContainer, [trace], layout);
+            break;
+            
+        // Add other visualization cases here
+        default:
+            vizContainer.innerHTML = 'Select a visualization type';
+    }
+}
+
 function initializeAnimations() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
