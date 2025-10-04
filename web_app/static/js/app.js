@@ -91,43 +91,50 @@ async function loadModelInfo() {
         const response = await fetch('/api/model-info');
         const data = await response.json();
         
+        const modelInfoEl = document.getElementById('modelInfo');
+        
         if (data.error) {
-            document.getElementById('modelInfo').innerHTML = `
-                <div class="model-info-content">
-                    <span class="info-icon">⚠️</span>
-                    <span>${data.error}</span>
-                </div>
-            `;
+            if (modelInfoEl) {
+                modelInfoEl.innerHTML = `
+                    <div class="model-info-content">
+                        <span class="info-icon">⚠️</span>
+                        <span>${data.error}</span>
+                    </div>
+                `;
+            }
             return;
         }
         
         // Update hero stats
-        if (data.accuracy) {
-            document.getElementById('modelAccuracy').textContent = `${(data.accuracy * 100).toFixed(1)}%`;
+        const accuracyEl = document.getElementById('modelAccuracy');
+        if (data.accuracy && accuracyEl) {
+            accuracyEl.textContent = `${(data.accuracy * 100).toFixed(1)}%`;
         }
         
         // Update model info banner
-        document.getElementById('modelInfo').innerHTML = `
-            <div class="model-info-content">
-                <span class="info-icon">ℹ️</span>
-                <span><strong>Model:</strong> ${data.model_type.toUpperCase()} | 
-                <strong>Accuracy:</strong> ${(data.accuracy * 100).toFixed(2)}% | 
-                <strong>Training Date:</strong> ${new Date(data.training_date).toLocaleDateString()} | 
-                <strong>Classes:</strong> ${data.classes.join(', ')}</span>
-            </div>
-        `;
-        
-        // Update status badge
-        document.getElementById('modelStatus').innerHTML = '<span class="status-badge status-ready">Ready</span>';
+        if (modelInfoEl) {
+            modelInfoEl.innerHTML = `
+                <div class="model-info-content">
+                    <span class="info-icon">ℹ️</span>
+                    <span><strong>Model:</strong> ${data.model_type.toUpperCase()} | 
+                    <strong>Accuracy:</strong> ${(data.accuracy * 100).toFixed(2)}% | 
+                    <strong>Training Date:</strong> ${new Date(data.training_date).toLocaleDateString()} | 
+                    <strong>Classes:</strong> ${data.classes.join(', ')}</span>
+                </div>
+            `;
+        }
         
     } catch (error) {
         console.error('Error loading model info:', error);
-        document.getElementById('modelInfo').innerHTML = `
-            <div class="model-info-content">
-                <span class="info-icon">⚠️</span>
-                <span>Failed to load model information</span>
-            </div>
-        `;
+        const modelInfoEl = document.getElementById('modelInfo');
+        if (modelInfoEl) {
+            modelInfoEl.innerHTML = `
+                <div class="model-info-content">
+                    <span class="info-icon">⚠️</span>
+                    <span>Failed to load model information</span>
+                </div>
+            `;
+        }
     }
 }
 
