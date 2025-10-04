@@ -34,6 +34,138 @@
             </div>
         </div>
     </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center min-vh-100">
+                <div class="col-md-8 mx-auto text-center">
+                    <h1 class="display-3 animate__animated animate__fadeInUp">Explore New Worlds</h1>
+                    <p class="lead animate__animated animate__fadeInUp animate__delay-1s">
+                        Discover and analyze exoplanets using advanced AI technology
+                    </p>
+                    <div class="search-container animate__animated animate__fadeInUp animate__delay-2s">
+                        <input type="text" class="form-control cosmic-search" placeholder="Search exoplanets...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Explorer -->
+    <section id="discover" class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Filters Panel -->
+                <div class="col-md-3">
+                    <div class="filters-panel">
+                        <h4>Filters</h4>
+                        <div class="filter-group">
+                            <label>Planet Size</label>
+                            <div class="range-slider">
+                                <input type="range" class="form-range" id="sizeRange" min="0" max="5" step="0.1">
+                                <span class="range-value">Earth Radii: <span id="sizeValue">1</span></span>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label>Temperature</label>
+                            <select class="form-select cosmic-select">
+                                <option>All Temperatures</option>
+                                <option>Habitable Zone (200-300K)</option>
+                                <option>Hot (300-700K)</option>
+                                <option>Very Hot (700K+)</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Star Type</label>
+                            <div class="btn-group d-flex">
+                                <button class="btn btn-outline-primary active">All</button>
+                                <button class="btn btn-outline-primary">M</button>
+                                <button class="btn btn-outline-primary">K</button>
+                                <button class="btn btn-outline-primary">G</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Grid -->
+                <div class="col-md-9">
+                    <div class="row" id="exoplanetGrid">
+                        <!-- Exoplanet cards will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Tool -->
+    <section id="compare" class="py-5 cosmic-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Compare Exoplanets</h2>
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="comparison-card" id="planet1">
+                        <select class="form-select cosmic-select mb-3">
+                            <option>Select Planet 1</option>
+                        </select>
+                        <div class="planet-data"></div>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="vs-badge">VS</div>
+                </div>
+                <div class="col-md-5">
+                    <div class="comparison-card" id="planet2">
+                        <select class="form-select cosmic-select mb-3">
+                            <option>Select Planet 2</option>
+                        </select>
+                        <div class="planet-data"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visualization Section -->
+    <section id="visualize" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Data Visualization</h2>
+            <div class="row">
+                <div class="col-12">
+                    <div class="viz-controls mb-4">
+                        <button class="btn btn-primary" data-viz="scatter">Mass vs Radius</button>
+                        <button class="btn btn-primary" data-viz="histogram">Temperature Distribution</button>
+                        <button class="btn btn-primary" data-viz="bubble">Star System Map</button>
+                    </div>
+                    <div id="vizContainer" class="cosmic-viz"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Planet Detail Modal -->
+    <div class="modal fade" id="planetModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content cosmic-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title">Planet Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="planet-details">
+                        <!-- Planet details will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
 <body class="space-theme">
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark cosmic-nav fixed-top">
