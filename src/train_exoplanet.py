@@ -2,157 +2,177 @@
 # -*- coding: utf-8 -*-
 
 """
-Robust exoplanet training script for NASA tables (Kepler/K2/TESS).
+Exoplanet classifier (XGBoost only) for NASA-style tables (Kepler/K2/TESS).
 
-- Handles NASA CSVs that start with '# ...' comment lines + a later "rowid,..." header.
-- Builds a unified binary label: label_3 = PLANET vs NOT
+- Reads NASA CSVs that often start with header comments (# ...) and the real
+  header later (usually a line beginning with 'rowid,').
+- Creates a unified binary label: label_3 = PLANET vs NOT
   * Kepler: koi_disposition == CONFIRMED -> PLANET
   * K2:     disposition in {CONFIRMED, CP} -> PLANET
   * TESS:   tfopwg_disp in {CP, CONFIRMED, CONFIRMED PLANET} -> PLANET
-- Merges all three datasets, keeps identifiers for name mapping, drops non-numeric features,
-  deduplicates (by best-available object ID), trains a baseline (impute+scale+logreg),
-  and saves artifacts:
+- Merges the three datasets, keeps identifiers for name mapping, drops non-numeric features,
+  deduplicates (by mission/source + object id + label), trains XGBoost with
+  RandomizedSearchCV + final early-stopping refit, and saves artifacts:
     outdir/
-      model.joblib
-      features.json
-      metrics.json
-      aggregated.parquet   # with IDs, source, label, and the numeric features used
+      model.joblib         # trained sklearn Pipeline (drop-NaN-cols -> imputer -> XGBClassifier)
+      features.json        # numeric feature list (order matters)
+      metrics.json         # validation metrics + best params
+      aggregated.parquet   # cleaned, deduped dataset with IDs/source/label/features used
 """
 
-import argparse, json, csv
+import argparse, json
 from pathlib import Path
+from typing import List
+
 import numpy as np
 import pandas as pd
 import joblib
 
-from sklearn.model_selection import train_test_split
+from xgboost.callback import EarlyStopping
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score, precision_recall_fscore_support,
     roc_auc_score, average_precision_score
 )
 
-from typing import List
+from xgboost import XGBClassifier
+from scipy.stats import loguniform, randint
+
+# ----------------------------- utility transformers -----------------------------
+
+class DropAllNaNColumns(BaseEstimator, TransformerMixin):
+    """Drop columns that are entirely NaN for the current fit fold."""
+    def __init__(self):
+        self.keep_cols_ = None
+
+    def fit(self, X, y=None):
+        if isinstance(X, pd.DataFrame):
+            mask = X.notna().any(axis=0)
+            self.keep_cols_ = X.columns[mask].tolist()
+        else:
+            # If array, keep columns that have any non-nan
+            mask = ~np.all(np.isnan(X), axis=0)
+            self.keep_cols_ = np.arange(X.shape[1])[mask].tolist()
+        return self
+
+    def transform(self, X):
+        if isinstance(X, pd.DataFrame):
+            return X.loc[:, self.keep_cols_]
+        else:
+            return X[:, self.keep_cols_]
+
+# ----------------------------- path helpers -----------------------------
 
 def resolve_paths(paths: List[str]) -> List[Path]:
-    """
-    Resolve input paths relative to:
-    - current working dir,
-    - repo root (two levels up from this file),
-    - data/raw/<filename> under repo root (if only a filename was given)
-    """
+    """Resolve input paths relative to repo root or data/raw."""
     here = Path(__file__).resolve()
     repo_root = here.parent.parent  # src/ -> repo root
     resolved = []
     for p in paths:
         pth = Path(p)
         if pth.exists():
-            resolved.append(pth)
-            continue
-        # try relative to repo root
+            resolved.append(pth); continue
         cand = (repo_root / p).resolve()
         if cand.exists():
             resolved.append(cand); continue
-        # if only a filename was given, try data/raw/<filename>
         if pth.name and (repo_root / "data" / "raw" / pth.name).exists():
             resolved.append((repo_root / "data" / "raw" / pth.name).resolve()); continue
         raise FileNotFoundError(f"Could not find data file: {p}")
     return resolved
 
+# ----------------------------- ID columns ------------------------------
 
-# Columns we consider as "identifiers" to keep for name mapping (not used as features)
 ID_CANDIDATES = [
-    "kepoi_name","kepler_name","kepid",           # Kepler
-    "pl_name","epic_id","hostname",               # K2
-    "toi","tid","tic_id","ctoi_alias"             # TESS
+    "kepoi_name","kepler_name","kepid",      # Kepler
+    "pl_name","epic_id","hostname",          # K2
+    
+    "toi","tid","tic_id","ctoi_alias"        # TESS
 ]
 
-# ---------- Robust NASA reader ----------
+def detect_id_cols(df: pd.DataFrame):
+    return [c for c in ID_CANDIDATES if c in df.columns]
+
+# ----------------------------- IO & labels -----------------------------
 
 def read_nasa_table(path: Path) -> pd.DataFrame:
-    """
-    NASA Archive files often start with comment lines ('# ...') describing the schema,
-    and only later contain the actual CSV header (starts with 'rowid,').
-    This function finds that header line and reads the table from there.
-    """
+    """Find the real CSV header (line starting with 'rowid,') and read from there."""
     path = Path(path)
     with open(path, "r", errors="ignore") as f:
+        header_row = 0
         for i, line in enumerate(f):
             if line.lower().startswith("rowid,"):
-                header_row = i
-                break
-        else:
-            header_row = 0  # fallback
-
+                header_row = i; break
     df = pd.read_csv(path, skiprows=header_row)
-    df["__source__"] = path.stem  # provenance
+    df["__source__"] = path.stem
     return df
-
-# ---------- Label builders per mission ----------
 
 def add_label_kepler(df: pd.DataFrame) -> pd.DataFrame:
     cols = {c.lower(): c for c in df.columns}
-    if "koi_disposition" not in cols:
+    col = cols.get("koi_disposition")
+    if col is None:
         raise ValueError("Kepler file missing 'koi_disposition'")
-    col = cols["koi_disposition"]
     lab = df[col].astype(str).str.upper()
     df["label_3"] = np.where(lab.str.contains("CONFIRMED"), "PLANET", "NOT")
     return df
 
 def add_label_k2(df: pd.DataFrame) -> pd.DataFrame:
-    # K2 tables vary; most have 'disposition'
     disp_col = None
     for key in ["disposition", "k2_disposition"]:
         for c in df.columns:
             if c.lower() == key:
-                disp_col = c
-                break
+                disp_col = c; break
         if disp_col: break
     if disp_col is None:
-        # any column containing 'disposition'
         for c in df.columns:
             if "disposition" in c.lower():
-                disp_col = c
-                break
+                disp_col = c; break
     if disp_col is None:
         raise ValueError("K2 file missing a disposition column")
-
     lab = df[disp_col].astype(str).str.upper().str.strip()
-    df["label_3"] = np.where((lab == "CONFIRMED") | (lab == "CP") | (lab.str.contains("CONFIRMED")), "PLANET", "NOT")
+    df["label_3"] = np.where((lab == "CONFIRMED") | (lab == "CP") | (lab.str.contains("CONFIRMED")),
+                             "PLANET", "NOT")
     return df
 
 def add_label_tess(df: pd.DataFrame) -> pd.DataFrame:
-    # TOI tables typically have 'tfopwg_disp' (values: CP, FP, PC)
     disp_col = None
     for c in df.columns:
         lc = c.lower().strip()
         if lc == "tfopwg_disp" or ("tfopwg" in lc and "disp" in lc):
-            disp_col = c
-            break
+            disp_col = c; break
     if disp_col is None:
         raise ValueError("TESS file missing 'tfopwg_disp'")
-
     lab = df[disp_col].astype(str).str.upper().str.strip()
-    df["label_3"] = np.where(lab.isin(["CP", "CONFIRMED", "CONFIRMED PLANET"]), "PLANET", "NOT")
+    df["label_3"] = np.where(lab.isin(["CP", "CONFIRMED", "CONFIRMED PLANET"]),
+                             "PLANET", "NOT")
     return df
 
-# ---------- Feature building & dedupe ----------
+# ----------------------------- features & metrics ----------------------
 
-def detect_id_cols(df: pd.DataFrame):
-    return [c for c in ID_CANDIDATES if c in df.columns]
+def engineer_features(X: pd.DataFrame) -> pd.DataFrame:
+    """Add simple engineered features (safe if inputs absent)."""
+    X = X.copy()
+    if 'transit_duration' in X.columns and 'orbital_period' in X.columns:
+        X['transit_duration_ratio'] = X['transit_duration'] / X['orbital_period']
+    if 'stellar_mass' in X.columns and 'stellar_radius' in X.columns:
+        X['stellar_density'] = X['stellar_mass'] / (X['stellar_radius']**3)
+    return X
+
+def get_feature_importance(model):
+    if hasattr(model, 'named_steps'):
+        xgb = model.named_steps['clf']
+        importances = xgb.feature_importances_
+        features = model.named_steps['imputer'].feature_names_in_
+        return pd.DataFrame({'feature': features, 'importance': importances}).sort_values('importance', ascending=False)
+    return None
 
 def build_feature_matrix(df: pd.DataFrame, id_cols):
-    # Drop label + id + source columns; keep numeric only; drop 'rowid'
     X = df.drop(columns=["label_3"] + id_cols + ["__source__"], errors="ignore")
     X = X.select_dtypes(include=[np.number]).copy()
     if "rowid" in X.columns:
         X = X.drop(columns=["rowid"])
-    # Remove constant columns
-    nunique = X.nunique()
-    X = X.loc[:, nunique > 1]
     return X
 
 def compute_metrics(y_true, y_prob, thresh=0.5):
@@ -166,98 +186,153 @@ def compute_metrics(y_true, y_prob, thresh=0.5):
         "f1_pos": float(f1),
     }
     if len(set(y_true)) == 2:
-        try: out["roc_auc"] = float(roc_auc_score(y_true, y_prob))
-        except Exception: out["roc_auc"] = None
-        try: out["pr_auc_pos"] = float(average_precision_score(y_true, y_prob))
-        except Exception: out["pr_auc_pos"] = None
+        out["roc_auc"] = float(roc_auc_score(y_true, y_prob))
+        out["pr_auc_pos"] = float(average_precision_score(y_true, y_prob))
     else:
-        out["roc_auc"] = None
-        out["pr_auc_pos"] = None
+        out["roc_auc"] = None; out["pr_auc_pos"] = None
     return out
 
-# ---------- Main ----------
+# ----------------------------- main -----------------------------------
 
 def main():
-    ap = argparse.ArgumentParser(description="Train exoplanet classifier on Kepler+K2+TESS NASA tables.")
+    ap = argparse.ArgumentParser(description="Train XGBoost exoplanet classifier")
     ap.add_argument("--data", nargs=3, required=True,
-                    help="Paths to the three files: cumulative.csv (Kepler), k2_pandas.csv (K2), TOI.csv (TESS)")
-    ap.add_argument("--outdir", required=True, help="Directory to write artifacts")
+                    help="Paths to: cumulative.csv (Kepler), k2_pandas.csv (K2), TOI.csv (TESS)")
+    ap.add_argument("--outdir", required=True)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--n_iter", type=int, default=80, help="RandomizedSearchCV iterations")
+    ap.add_argument("--gpu", action="store_true")
     args = ap.parse_args()
 
     outdir = Path(args.outdir); outdir.mkdir(parents=True, exist_ok=True)
 
+    # 1) Read data
     kep_path, k2_path, tess_path = resolve_paths(args.data)
+    kepler = add_label_kepler(read_nasa_table(kep_path))
+    k2     = add_label_k2(read_nasa_table(k2_path))
+    tess   = add_label_tess(read_nasa_table(tess_path))
+    all_df = pd.concat([kepler, k2, tess], ignore_index=True).copy()
 
-    # 1) Read tables (robust header detection)
-    kepler = read_nasa_table(kep_path)
-    k2     = read_nasa_table(k2_path)
-    tess   = read_nasa_table(tess_path)
-
-    # 2) Add label_3 per mission
-    kepler["__source__"] = "kepler"; kepler = add_label_kepler(kepler)
-    k2["__source__"]     = "k2";     k2     = add_label_k2(k2)
-    tess["__source__"]   = "tess";   tess   = add_label_tess(tess)
-
-    # 3) Merge
-    all_df = pd.concat([kepler, k2, tess], ignore_index=True)
-    all_df = all_df.copy()  # defragment to avoid PerformanceWarning on later inserts
-
-    # 4) Keep track of IDs and object id
+    # 2) Build IDs + dedupe
     id_cols = detect_id_cols(all_df)
-
-    # Build a single object ID per row without .apply (avoids fragmentation)
     if id_cols:
         vals = all_df[id_cols].to_numpy()
         mask = ~pd.isna(vals)
-        first_any = mask.any(axis=1)
-        first_idx = mask.argmax(axis=1)
-        obj_ids = np.where(first_any, vals[np.arange(len(vals)), first_idx], None)
+        obj_ids = np.where(mask.any(axis=1), vals[np.arange(len(vals)), mask.argmax(axis=1)], None)
         all_df["__obj_id__"] = obj_ids
     else:
         all_df["__obj_id__"] = None
 
-    # 5) Deduplicate (prefer by source+object_id+label)
     before = len(all_df)
     all_df = all_df.drop_duplicates(subset=["__source__", "__obj_id__", "label_3"], keep="last")
-    after = len(all_df)
+    after  = len(all_df)
     if after < before:
         print(f"[info] Removed {before - after} duplicate rows")
 
-    # 6) Build feature matrix + target
-    X = build_feature_matrix(all_df, id_cols + ["__obj_id__"])
+    # 3) Features
+    X = engineer_features(build_feature_matrix(all_df, id_cols + ["__obj_id__"]))
     y = (all_df["label_3"] == "PLANET").astype(int).values
+    print(f"[info] Initial feature count: {X.shape[1]}")
 
-    # 7) Train/val split & model
+    # 4) Split (hold-out for early stopping)
     Xtr, Xva, ytr, yva = train_test_split(X, y, test_size=0.2, random_state=args.seed, stratify=y)
-    pipe = Pipeline(steps=[
+
+    # 5) Class imbalance
+    pos, neg = (ytr == 1).sum(), (ytr == 0).sum()
+    spw = float(neg / max(1, pos))
+    tree_method = "gpu_hist" if args.gpu else "hist"
+    print(f"[info] pos={pos}, neg={neg}, scale_pos_weight={spw:.2f}, tree_method={tree_method}")
+
+    # 6) RandomizedSearchCV (NO early stopping here)
+    xgb_pipe = Pipeline([
+        ("dropnan", DropAllNaNColumns()),
         ("imputer", SimpleImputer(strategy="median")),
-        ("scaler", StandardScaler()),
-        ("clf", LogisticRegression(max_iter=500, class_weight="balanced", solver="lbfgs"))
+        ("clf", XGBClassifier(
+            objective="binary:logistic",
+            eval_metric="auc",
+            tree_method=tree_method,
+            n_estimators=2000,
+            n_jobs=-1,
+            random_state=args.seed
+        ))
     ])
-    pipe.fit(Xtr, ytr)
-    yprob = pipe.predict_proba(Xva)[:, 1]
+
+    param_dist = {
+        "clf__max_depth": randint(3, 9),
+        "clf__learning_rate": loguniform(1e-3, 3e-1),
+        "clf__subsample": loguniform(0.5, 1.0),
+        "clf__colsample_bytree": loguniform(0.5, 1.0),
+        "clf__min_child_weight": loguniform(0.2, 10),
+        "clf__gamma": loguniform(1e-4, 10),
+        "clf__reg_alpha": loguniform(1e-4, 10),
+        "clf__reg_lambda": loguniform(1e-4, 10),
+        "clf__scale_pos_weight": [spw],
+    }
+
+    search = RandomizedSearchCV(
+        estimator=xgb_pipe,
+        param_distributions=param_dist,
+        n_iter=args.n_iter,
+        scoring="average_precision",
+        n_jobs=-1,
+        cv=3,
+        verbose=1,
+        random_state=args.seed
+    )
+    # IMPORTANT: do NOT pass eval_set/early_stopping here
+    search.fit(Xtr, ytr)
+    best_params = search.best_params_
+    print("[info] Best params:", best_params)
+
+    # 7) Final refit with early stopping on (Xva, yva)
+    best_pipe = Pipeline([
+        ("dropnan", DropAllNaNColumns()),
+        ("imputer", SimpleImputer(strategy="median")),
+        ("clf", XGBClassifier(
+            objective="binary:logistic",
+            eval_metric="auc",
+            tree_method=tree_method,
+            n_estimators=2000,
+            n_jobs=-1,
+            random_state=args.seed,
+            **{k.replace("clf__", ""): v for k, v in best_params.items()}
+        ))
+    ])
+    best_pipe.fit(
+        Xtr, ytr,
+        clf__eval_set=[(Xva, yva)],
+        clf__callbacks=[EarlyStopping(rounds=50, save_best=True, maximize=True)],
+        clf__verbose=False
+    )
+
+
+    # 8) Metrics
+    yprob = best_pipe.predict_proba(Xva)[:, 1]
     metrics = compute_metrics(yva, yprob)
     metrics.update({
-        "n_train": int(len(Xtr)),
-        "n_val": int(len(Xva)),
-        "n_features": int(X.shape[1] ),
+        "best_params": best_params,
+        "cv_best_score": float(search.best_score_),
+        "n_train": int(len(Xtr)), "n_val": int(len(Xva)),
+        "n_features": int(X.shape[1]),
         "class_balance_overall": float(y.mean())
     })
-    print(json.dumps(metrics, indent=2))
 
-    # 8) Save artifacts
-    joblib.dump(pipe, outdir / "model.joblib")
+    importance_df = get_feature_importance(best_pipe)
+    if importance_df is not None:
+        metrics["feature_importance"] = importance_df.head(20).to_dict(orient="records")
+        print("\nTop features:\n", importance_df.head(10).to_string(index=False))
+
+    print("\nModel metrics:\n", json.dumps(metrics, indent=2))
+
+    # 9) Save artifacts
+    joblib.dump(best_pipe, outdir / "model.joblib")
     (outdir / "features.json").write_text(json.dumps(list(X.columns), indent=2))
     (outdir / "metrics.json").write_text(json.dumps(metrics, indent=2))
 
-    # --- PATCH 1: ensure string dtypes for Arrow ---
-    # Coerce ID-like columns and __source__/__obj_id__ to pandas nullable string
+    # Save merged dataset for traceability
     for c in (id_cols + ["__obj_id__", "__source__"]):
         if c in all_df.columns:
             all_df[c] = all_df[c].astype("string")
-
-    # Save the aggregated dataset with IDs + source + label + features used
     cols_keep = id_cols + ["__source__", "label_3", "__obj_id__"] + list(X.columns)
     all_df.loc[:, cols_keep].to_parquet(outdir / "aggregated.parquet", index=False)
     print(f"[ok] Artifacts saved under: {outdir}")
