@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=7.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=9.5">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -44,10 +44,6 @@
     <nav class="nav" id="navbar">
         <div class="nav-container">
             <div class="nav-brand">
-                <svg class="logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>
                 <span class="logo-text">Exoplanet AI Hunter</span>
             </div>
             <div class="nav-links">
@@ -64,7 +60,7 @@
             <div class="hero-content">
                 <div class="badge animate-fadeInUp">2025 NASA Space Apps Challenge</div>
                 <h1 class="hero-title animate-fadeInUp" style="animation-delay: 0.1s">
-                    A World Away: Hunting for
+                    A World Away: Hunting for<br>
                     <span class="gradient-text">Exoplanets with AI</span>
                 </h1>
                 <p class="hero-description animate-fadeInUp" style="animation-delay: 0.2s">
@@ -196,8 +192,8 @@
                     </div>
                     <h3 class="feature-title">Visual Insights</h3>
                     <p class="feature-description">
-                        Interactive charts display probability distributions and feature importance, 
-                        helping you understand model decisions.
+                        Interactive charts display probability distributions, 
+                        helping you understand model predictions and confidence levels.
                     </p>
                 </div>
 
@@ -227,219 +223,137 @@
                 </p>
             </div>
 
-            <!-- Main Content Grid -->
-            <div class="content-grid">
-            <!-- Input Section -->
-            <div class="input-card">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <h2 class="card-title">Configure Parameters</h2>
-                        <p class="card-description">Enter astronomical observation data for classification</p>
-                    </div>
-                </div>
-
-                <div class="instruction-callout">
-                    <svg class="callout-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
-                    <div class="callout-content">
-                        <strong>Data Entry Guide:</strong> If your data includes uncertainty (e.g., 2.9575±0.0819), 
-                        enter only the measured value: <code>2.9575</code>
-                    </div>
-                </div>
-                
-                <form id="predictionForm" class="input-form">
-                    <!-- Orbital Period -->
-                    <div class="input-group">
-                        <label for="orbital_period" class="input-label">
-                            <span>Orbital Period</span>
-                            <span class="label-unit">days</span>
-                        </label>
-                        <input type="number" id="orbital_period" name="orbital_period" 
-                               class="input-field" step="any" placeholder="1.736952453">
-                        <p class="input-hint">Time for one complete orbit around the star</p>
+            <!-- Configure Parameters Section (Full Width) -->
+            <div class="full-width-section">
+                <div class="input-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h2 class="card-title">Configure Parameters</h2>
+                            <p class="card-description">Enter astronomical observation data for classification</p>
+                        </div>
                     </div>
 
-                    <!-- Transit Duration -->
-                    <div class="input-group">
-                        <label for="transit_duration" class="input-label">
-                            <span>Transit Duration</span>
-                            <span class="label-unit">hours</span>
-                        </label>
-                        <input type="number" id="transit_duration" name="transit_duration" 
-                               class="input-field" step="any" placeholder="2.9575">
-                        <p class="input-hint">Time to cross the star's disk</p>
-                    </div>
-
-                    <!-- Planetary Radius -->
-                    <div class="input-group">
-                        <label for="planetary_radius" class="input-label">
-                            <span>Planetary Radius</span>
-                            <span class="label-unit">Earth radii</span>
-                        </label>
-                        <input type="number" id="planetary_radius" name="planetary_radius" 
-                               class="input-field" step="any" placeholder="1.234567">
-                        <p class="input-hint">Size relative to Earth</p>
-                    </div>
-
-                    <!-- Stellar Magnitude -->
-                    <div class="input-group">
-                        <label for="stellar_magnitude" class="input-label">
-                            <span>Stellar Magnitude</span>
-                        </label>
-                        <input type="number" id="stellar_magnitude" name="stellar_magnitude" 
-                               class="input-field" step="any" placeholder="15.313">
-                        <p class="input-hint">Apparent brightness of the host star</p>
-                    </div>
-
-                    <!-- Transit Depth -->
-                    <div class="input-group">
-                        <label for="transit_depth" class="input-label">
-                            <span>Transit Depth</span>
-                            <span class="label-unit">ppm</span>
-                        </label>
-                        <input type="number" id="transit_depth" name="transit_depth" 
-                               class="input-field" step="any" placeholder="2089.0">
-                        <p class="input-hint">Decrease in star brightness during transit</p>
-                    </div>
-
-                    <!-- Impact Parameter -->
-                    <div class="input-group">
-                        <label for="impact_parameter" class="input-label">
-                            <span>Impact Parameter</span>
-                        </label>
-                        <input type="number" id="impact_parameter" name="impact_parameter" 
-                               class="input-field" step="any" placeholder="0.21">
-                        <p class="input-hint">Distance between planet and star center (0-1)</p>
-                    </div>
-
-                    <!-- Equilibrium Temperature -->
-                    <div class="input-group">
-                        <label for="equilibrium_temperature" class="input-label">
-                            <span>Equilibrium Temperature</span>
-                            <span class="label-unit">K</span>
-                        </label>
-                        <input type="number" id="equilibrium_temperature" name="equilibrium_temperature" 
-                               class="input-field" step="any" placeholder="1500.5">
-                        <p class="input-hint">Expected temperature based on stellar radiation</p>
-                    </div>
-
-                    <!-- Insolation Flux -->
-                    <div class="input-group">
-                        <label for="insolation_flux" class="input-label">
-                            <span>Insolation Flux</span>
-                            <span class="label-unit">Earth flux</span>
-                        </label>
-                        <input type="number" id="insolation_flux" name="insolation_flux" 
-                               class="input-field" step="any" placeholder="100.5">
-                        <p class="input-hint">Amount of stellar energy received</p>
-                    </div>
-
-                    <!-- Stellar Surface Gravity -->
-                    <div class="input-group">
-                        <label for="stellar_surface_gravity" class="input-label">
-                            <span>Stellar Surface Gravity</span>
-                            <span class="label-unit">log g</span>
-                        </label>
-                        <input type="number" id="stellar_surface_gravity" name="stellar_surface_gravity" 
-                               class="input-field" step="any" placeholder="4.437">
-                        <p class="input-hint">Surface gravity of the host star</p>
-                    </div>
-
-                    <!-- Stellar Radius -->
-                    <div class="input-group">
-                        <label for="stellar_radius" class="input-label">
-                            <span>Stellar Radius</span>
-                            <span class="label-unit">Solar radii</span>
-                        </label>
-                        <input type="number" id="stellar_radius" name="stellar_radius" 
-                               class="input-field" step="any" placeholder="1.012345">
-                        <p class="input-hint">Size of host star relative to our Sun</p>
-                    </div>
-
-                    <!-- Stellar Mass -->
-                    <div class="input-group">
-                        <label for="stellar_mass" class="input-label">
-                            <span>Stellar Mass</span>
-                            <span class="label-unit">Solar masses</span>
-                        </label>
-                        <input type="number" id="stellar_mass" name="stellar_mass" 
-                               class="input-field" step="any" placeholder="1.023456">
-                        <p class="input-hint">Mass of host star relative to our Sun</p>
-                    </div>
-
-                    <!-- Stellar Metallicity -->
-                    <div class="input-group">
-                        <label for="stellar_metallicity" class="input-label">
-                            <span>Stellar Metallicity</span>
-                            <span class="label-unit">[Fe/H]</span>
-                        </label>
-                        <input type="number" id="stellar_metallicity" name="stellar_metallicity" 
-                               class="input-field" step="any" placeholder="0.123">
-                        <p class="input-hint">Metal content compared to the Sun</p>
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <path d="m21 21-4.35-4.35"></path>
-                            </svg>
-                            Classify Exoplanet
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="1 4 1 10 7 10"></polyline>
-                                <polyline points="23 20 23 14 17 14"></polyline>
-                                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
-                            </svg>
-                            Reset
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Results Section -->
-            <div class="results-card">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <h2 class="card-title">Classification Results</h2>
-                        <p class="card-description">AI-powered exoplanet detection analysis</p>
-                    </div>
-                </div>
-                
-                <!-- Results will be displayed here -->
-                <div id="results" class="results-placeholder">
-                    <div class="empty-state">
-                        <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <div class="instruction-callout">
+                        <svg class="callout-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M12 6v6l4 2"></path>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
                         </svg>
-                        <h3>Awaiting Classification</h3>
-                        <p>Enter at least 3 features and submit to see results</p>
+                        <div class="callout-content">
+                            <strong>Input Guide:</strong> All 5 fields are required for prediction. If your data includes uncertainty (e.g., 2.96±0.08), enter only the measured value: <code>2.96</code>
+                        </div>
                     </div>
-                </div>
+                    
+                    <form id="predictionForm" class="input-form input-form-grid">
+                        <!-- Orbital Period (REQUIRED) -->
+                        <div class="input-group">
+                            <label for="orbital_period" class="input-label">
+                                <span>Orbital Period <span class="required-star">*</span></span>
+                                <span class="label-unit">days</span>
+                            </label>
+                            <input type="number" id="orbital_period" name="orbital_period" 
+                                   class="input-field" step="any" placeholder="9.49" required>
+                            <p class="input-hint">Time for one complete orbit around the star</p>
+                        </div>
 
-                <!-- Probability Chart -->
-                <div id="chartContainer" class="chart-section" style="display: none;">
-                    <h3 class="chart-title">Class Probabilities</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="probabilityChart"></canvas>
+                        <!-- Transit Duration (REQUIRED) -->
+                        <div class="input-group">
+                            <label for="transit_duration" class="input-label">
+                                <span>Transit Duration <span class="required-star">*</span></span>
+                                <span class="label-unit">hours</span>
+                            </label>
+                            <input type="number" id="transit_duration" name="transit_duration" 
+                                   class="input-field" step="any" placeholder="2.96" required>
+                            <p class="input-hint">Time to cross the star's disk</p>
+                        </div>
+
+                        <!-- Planetary Radius (REQUIRED) -->
+                        <div class="input-group">
+                            <label for="planetary_radius" class="input-label">
+                                <span>Planetary Radius <span class="required-star">*</span></span>
+                                <span class="label-unit">Earth radii</span>
+                            </label>
+                            <input type="number" id="planetary_radius" name="planetary_radius" 
+                                   class="input-field" step="any" placeholder="2.26" required>
+                            <p class="input-hint">Size relative to Earth</p>
+                        </div>
+
+                        <!-- Equilibrium Temperature (REQUIRED) -->
+                        <div class="input-group">
+                            <label for="equilibrium_temperature" class="input-label">
+                                <span>Equilibrium Temperature <span class="required-star">*</span></span>
+                                <span class="label-unit">K</span>
+                            </label>
+                            <input type="number" id="equilibrium_temperature" name="equilibrium_temperature" 
+                                   class="input-field" step="any" placeholder="793.00" required>
+                            <p class="input-hint">Expected temperature based on stellar radiation</p>
+                        </div>
+
+                        <!-- Stellar Radius (REQUIRED) -->
+                        <div class="input-group">
+                            <label for="stellar_radius" class="input-label">
+                                <span>Stellar Radius <span class="required-star">*</span></span>
+                                <span class="label-unit">Solar radii</span>
+                            </label>
+                            <input type="number" id="stellar_radius" name="stellar_radius" 
+                                   class="input-field" step="any" placeholder="0.93" required>
+                            <p class="input-hint">Size of host star relative to our Sun</p>
+                        </div>
+
+                        <!-- Buttons (Full Width at the bottom) -->
+                        <div class="form-actions form-actions-full">
+                            <button type="submit" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                                Classify Exoplanet
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="1 4 1 10 7 10"></polyline>
+                                    <polyline points="23 20 23 14 17 14"></polyline>
+                                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                                </svg>
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Classification Results Section (Full Width) -->
+            <div class="full-width-section">
+                <div class="results-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h2 class="card-title">Classification Results</h2>
+                            <p class="card-description">AI-powered exoplanet detection analysis</p>
+                        </div>
                     </div>
-                </div>
+                    
+                    <!-- Results will be displayed here -->
+                    <div id="results" class="results-placeholder">
+                        <div class="empty-state">
+                            <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                            </svg>
+                            <h3>Awaiting Classification</h3>
+                            <p>Enter the 5 required fields and submit to see results</p>
+                        </div>
+                    </div>
 
-                <!-- Feature Importance Chart -->
-                <div id="featureImportanceContainer" class="chart-section" style="display: none;">
-                    <h3 class="chart-title">Feature Importance</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="featureImportanceChart"></canvas>
+                    <!-- Probability Chart -->
+                    <div id="chartContainer" class="chart-section" style="display: none;">
+                        <h3 class="chart-title">Class Probabilities</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="probabilityChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Footer -->
         <footer class="footer">

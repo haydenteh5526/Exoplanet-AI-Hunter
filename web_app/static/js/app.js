@@ -2,12 +2,10 @@
 // NASA Space Apps Challenge 2025
 
 let probabilityChart = null;
-let featureImportanceChart = null;
 
 // Load model information on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadModelInfo();
-    loadFeatureImportance();
     initSmoothScroll();
     initScrollSpy();
     initIntersectionObserver();
@@ -138,21 +136,6 @@ async function loadModelInfo() {
     }
 }
 
-// Load feature importance
-async function loadFeatureImportance() {
-    try {
-        const response = await fetch('/api/feature-importance');
-        const data = await response.json();
-        
-        if (data.feature_importance) {
-            createFeatureImportanceChart(data.feature_importance);
-            document.getElementById('featureImportanceContainer').style.display = 'block';
-        }
-    } catch (error) {
-        console.error('Error loading feature importance:', error);
-    }
-}
-
 // Handle form submission
 document.getElementById('predictionForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -250,8 +233,7 @@ function displayResults(result) {
         let resultsHTML = `
             <div class="result-card ${dispositionClass}">
                 <div class="result-header">
-                    <span class="result-icon">${dispositionIcon}</span>
-                    <h3>${result.disposition.replace('_', ' ')}</h3>
+                    <h3><span class="result-icon">${dispositionIcon}</span> ${result.disposition.replace('_', ' ')}</h3>
                 </div>
                 <div class="result-confidence">
                     <p>ML Model Confidence: <strong>${(result.confidence * 100).toFixed(2)}%</strong></p>
@@ -272,6 +254,7 @@ function displayResults(result) {
             // Defensive check for matched_features
             const matchedFeatures = Array.isArray(match.matched_features) ? match.matched_features : [];
             const featuresProvided = Array.isArray(result.features_provided) ? result.features_provided : [];
+            const totalFeatures = featuresProvided.length;
             
             // Get planet name (convert KOI to Kepler name if possible)
             const displayName = formatPlanetName(match.name);
@@ -289,7 +272,7 @@ function displayResults(result) {
                             <p><strong>Catalog ID:</strong> ${match.name || 'Unknown'}</p>
                             <p><strong>Source:</strong> ${match.source || 'Unknown'} Mission</p>
                             ${match.discovery_year ? `<p><strong>Discovery Year:</strong> ${match.discovery_year}</p>` : ''}
-                            <p><strong>Features Compared:</strong> ${match.num_matched || matchedFeatures.length}/${match.features_provided || featuresProvided.length}</p>
+                            <p><strong>Features Compared:</strong> ${matchedFeatures.length}/${totalFeatures}</p>
                             ${match.features_skipped > 0 ? `<p class="features-skipped"><em>Note: ${match.features_skipped} feature(s) not available in database for this object</em></p>` : ''}
                         </div>
                         <details class="match-values">
@@ -334,25 +317,6 @@ function displayResults(result) {
                     </div>
                 `;
             }
-        }
-        
-        // Add quality score if available
-        if (result.quality_score !== undefined) {
-            resultsHTML += `
-                <div class="quality-info">
-                    <p><strong>Data Quality:</strong> ${result.quality_message || 'N/A'}</p>
-                    <p><strong>Features Provided:</strong> ${result.features_provided ? result.features_provided.length : 0}/9</p>
-                </div>
-            `;
-        }
-        
-        // Add recommendation
-        if (result.recommendation) {
-            resultsHTML += `
-                <div class="recommendation">
-                    <p><strong>💡 Recommendation:</strong> ${result.recommendation}</p>
-                </div>
-            `;
         }
         
         resultsHTML += `</div>`;
@@ -440,58 +404,6 @@ function createProbabilityChart(probabilities) {
                 title: {
                     display: true,
                     text: 'Classification Probabilities'
-                }
-            }
-        }
-    });
-}
-
-// Create feature importance chart
-function createFeatureImportanceChart(featureImportance) {
-    const ctx = document.getElementById('featureImportanceChart');
-    
-    // Destroy existing chart
-    if (featureImportanceChart) {
-        featureImportanceChart.destroy();
-    }
-    
-    // Sort by importance and take top 9
-    const sortedFeatures = featureImportance.slice(0, 9);
-    const labels = sortedFeatures.map(f => formatFeatureName(f.feature));
-    const data = sortedFeatures.map(f => f.importance * 100);
-    
-    featureImportanceChart = new Chart(ctx, {
-        type: 'bar',  // Changed from 'horizontalBar' to 'bar' for Chart.js v3+
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Importance (%)',
-                data: data,
-                backgroundColor: 'rgba(156, 39, 176, 0.6)',
-                borderColor: 'rgba(156, 39, 176, 1)',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Importance (%)'
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                title: {
-                    display: true,
-                    text: 'Top Feature Importances'
                 }
             }
         }

@@ -4,12 +4,12 @@
     "orbital_period",
     "transit_duration",
     "planetary_radius",
-    "stellar_magnitude",
     "transit_depth",
     "impact_parameter",
     "equilibrium_temperature",
-    "stellar_radius",
-    "stellar_mass"
+    "insolation_flux",
+    "stellar_surface_gravity",
+    "stellar_radius"
   ],
   "class_names": [
     "CANDIDATE",
