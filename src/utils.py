@@ -56,13 +56,13 @@ def validate_input_features(
         ...     print(f"Cannot predict: {msg}")
         ...     return disp  # Returns 'NO_PREDICT'
     """
-    # Define core features needed for reliable prediction
+    # Define core features currently collected by the web form (5 required fields)
     core_features = [
         'orbital_period',
         'transit_duration',
         'planetary_radius',
-        'stellar_magnitude',
-        'transit_depth'
+        'equilibrium_temperature',
+        'stellar_radius'
     ]
     
     if required_features is None:

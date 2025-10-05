@@ -152,12 +152,14 @@ document.getElementById('predictionForm').addEventListener('submit', async funct
         }
     }
     
-    // Validate minimum features
-    if (featureCount < 3) {
+    // Note: HTML5 'required' attribute on form fields ensures minimum fields are provided
+    // This validation is redundant but kept for additional safety
+    const minimumRequiredFields = 5;
+    if (featureCount < minimumRequiredFields) {
         displayResults({
             disposition: 'NO_PREDICT',
             confidence: 0,
-            message: 'Please provide at least 3 features for prediction.',
+            message: `Please provide at least ${minimumRequiredFields} features for prediction.`,
             all_probabilities: {},
             recommendation: 'Enter more feature values to get a classification.'
         });
@@ -259,10 +261,28 @@ function displayResults(result) {
             // Get planet name (convert KOI to Kepler name if possible)
             const displayName = formatPlanetName(match.name);
             
+            // Check if ML prediction differs from database disposition
+            const mlPrediction = result.disposition;
+            const dbDisposition = match.disposition;
+            const dispositionMismatch = dbDisposition && mlPrediction !== dbDisposition;
+            
             resultsHTML += `
                 <div class="exoplanet-match">
                     <h4>🎯 Known Exoplanet Match Found!</h4>
                     <p class="match-explanation">Your input closely matches a known exoplanet in our database. The <strong>similarity score</strong> below indicates how well your measurements align with this confirmed planet's characteristics.</p>
+                    ${dispositionMismatch ? `
+                        <div class="disposition-notice">
+                            <span class="notice-icon">ℹ️</span>
+                            <div class="notice-content">
+                                <strong>Note:</strong> The ML model predicted <strong>${mlPrediction}</strong>, but this object is classified as <strong>${dbDisposition}</strong> in the database. This difference may be due to:
+                                <ul>
+                                    <li>Different validation standards between data sources</li>
+                                    <li>The model being trained on a specific dataset (e.g., Kepler)</li>
+                                    <li>Updated classifications in the NASA Exoplanet Archive</li>
+                                </ul>
+                            </div>
+                        </div>
+                    ` : ''}
                     <div class="match-card">
                         <div class="match-header">
                             <h3>${displayName}</h3>
@@ -271,12 +291,13 @@ function displayResults(result) {
                         <div class="match-details">
                             <p><strong>Catalog ID:</strong> ${match.name || 'Unknown'}</p>
                             <p><strong>Source:</strong> ${match.source || 'Unknown'} Mission</p>
+                            ${match.disposition ? `<p><strong>Database Disposition:</strong> <span class="db-disposition db-disposition-${match.disposition.toLowerCase()}">${match.disposition}</span></p>` : ''}
                             ${match.discovery_year ? `<p><strong>Discovery Year:</strong> ${match.discovery_year}</p>` : ''}
                             <p><strong>Features Compared:</strong> ${matchedFeatures.length}/${totalFeatures}</p>
                             ${match.features_skipped > 0 ? `<p class="features-skipped"><em>Note: ${match.features_skipped} feature(s) not available in database for this object</em></p>` : ''}
                         </div>
-                        <details class="match-values">
-                            <summary>View Comparison</summary>
+                        <div class="match-values">
+                            <h5>Feature Comparison</h5>
                             <table class="comparison-table">
                                 <thead>
                                     <tr>
@@ -299,7 +320,7 @@ function displayResults(result) {
                                     }).join('')}
                                 </tbody>
                             </table>
-                        </details>
+                        </div>
                     </div>
                 </div>
             `;

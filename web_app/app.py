@@ -41,6 +41,7 @@ DEBUG_MODE = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
 # Exoplanet matching configuration
 MATCHING_TOP_N = int(os.getenv('MATCHING_TOP_N', 3))
 MATCHING_SIMILARITY_THRESHOLD_CONFIRMED = float(os.getenv('MATCHING_SIMILARITY_CONFIRMED', 0.80))
+MATCHING_SIMILARITY_THRESHOLD_CANDIDATE = float(os.getenv('MATCHING_SIMILARITY_CANDIDATE', 0.75))
 MATCHING_SIMILARITY_THRESHOLD_DEFAULT = float(os.getenv('MATCHING_SIMILARITY_DEFAULT', 0.85))
 MATCHING_MIN_FEATURES = int(os.getenv('MATCHING_MIN_FEATURES', 3))
 
@@ -211,6 +212,7 @@ def find_matching_exoplanet(input_data, top_n=None, similarity_threshold=None):
                 'name': identifier,  # This will be KOI/EPIC/TOI identifier (e.g., "K00752.01")
                 'similarity': float(avg_similarity),
                 'source': row.get('dataset', row.get('source', 'Unknown')),  # Use 'dataset' column
+                'disposition': row.get('disposition', 'Unknown'),  # Add disposition from database
                 'discovery_year': safe_value(row.get('discovery_year')),
                 'features': {
                     'orbital_period': safe_value(row.get('orbital_period')),
@@ -290,12 +292,13 @@ def predict():
         
         if not is_valid:
             # Return NO_PREDICT response
+            # Note: The validation_message already includes the specific minimum required
             return jsonify({
                 'disposition': validation_disposition,
                 'confidence': 0.0,
                 'message': validation_message,
                 'all_probabilities': {},
-                'recommendation': 'Please provide at least 3 valid features for prediction.'
+                'recommendation': 'Please provide all required features for prediction.'
             })
         
         # Check feature quality
@@ -322,6 +325,11 @@ def predict():
         
         feature_array = []
         
+        # Note: The model was trained with 9 features, but the form only collects 5.
+        # Missing features are filled with 0.0 as a placeholder.
+        # For optimal predictions, consider:
+        # 1. Retraining the model with only the 5 features, OR
+        # 2. Using median imputation based on training data statistics
         for feature in features:
             value = input_data.get(feature, 0.0)  # Use 0.0 for missing features
             if value is None:
@@ -348,13 +356,15 @@ def predict():
         provided_features = len([v for v in input_data.values() if v is not None])
         quality_score = provided_features / total_features if total_features > 0 else 0
         
-        # Find matching known exoplanets (if CONFIRMED)
+        # Find matching known exoplanets (for CONFIRMED and CANDIDATE)
         matches = []
-        if predicted_class == 'CONFIRMED':
+        if predicted_class in ['CONFIRMED', 'CANDIDATE']:
+            # Use slightly lower threshold for CANDIDATE to show potential matches
+            threshold = MATCHING_SIMILARITY_THRESHOLD_CONFIRMED if predicted_class == 'CONFIRMED' else MATCHING_SIMILARITY_THRESHOLD_CANDIDATE
             matches = find_matching_exoplanet(
                 input_data, 
                 top_n=MATCHING_TOP_N, 
-                similarity_threshold=MATCHING_SIMILARITY_THRESHOLD_CONFIRMED
+                similarity_threshold=threshold
             )
         
         # Format response
