@@ -1,0 +1,103 @@
+
+============================================================
+SUMMARY: KEPLER CUMULATIVE
+============================================================
+
+Total Records: 9,487
+
+Disposition Distribution:
+  FALSE_POSITIVE      :  4,772 ( 50.3%)
+  CONFIRMED           :  2,746 ( 28.9%)
+  CANDIDATE           :  1,969 ( 20.8%)
+
+Feature Completeness (% non-null):
+  orbital_period           : 100.0%
+  transit_duration         : 100.0%
+  planetary_radius         :  96.2%
+  stellar_magnitude        : 100.0%
+  transit_depth            :  96.2%
+  impact_parameter         :  96.2%
+  equilibrium_temperature  :  96.2%
+  stellar_radius           :  96.2%
+  stellar_mass             :  96.2%
+  disposition_score        :  84.4%
+
+Feature Statistics (non-null values):
+Feature                            Min         Mean          Max          Std
+-------------------------------------------------------------------------
+orbital_period                2.42e-01     7.56e+01     1.30e+05     1.34e+03
+transit_duration              5.20e-02     5.61e+00     1.39e+02     6.43e+00
+planetary_radius              8.00e-02     1.89e+01     4.63e+03     8.32e+01
+stellar_magnitude             6.97e+00     1.43e+01     2.00e+01     1.38e+00
+transit_depth                 0.00e+00     2.35e+04     1.54e+06     8.18e+04
+impact_parameter              0.00e+00     5.56e-01     1.99e+00     3.97e-01
+equilibrium_temperature       2.50e+01     1.09e+03     1.47e+04     8.58e+02
+stellar_radius                1.09e-01     1.73e+00     2.30e+02     6.15e+00
+stellar_mass                  0.00e+00     1.02e+00     3.73e+00     3.48e-01
+disposition_score             0.00e+00     4.84e-01     1.00e+00     4.77e-01
+
+============================================================
+SUMMARY: K2 PLANETS & CANDIDATES
+============================================================
+
+Total Records: 1,798
+
+Disposition Distribution:
+  CANDIDATE           :    976 ( 54.3%)
+  CONFIRMED           :    580 ( 32.3%)
+  FALSE_POSITIVE      :    242 ( 13.5%)
+
+Feature Completeness (% non-null):
+  orbital_period           :  98.5%
+  transit_duration         :   0.0%
+  planetary_radius         :  74.7%
+  stellar_magnitude        :   0.0%
+  transit_depth            :   0.0%
+  impact_parameter         :   0.0%
+  equilibrium_temperature  :  13.9%
+  stellar_radius           :  96.4%
+  stellar_mass             :  49.0%
+  disposition_score        :   0.0%
+
+Feature Statistics (non-null values):
+Feature                            Min         Mean          Max          Std
+-------------------------------------------------------------------------
+orbital_period                1.76e-01     7.02e+01     8.38e+04     2.00e+03
+planetary_radius              4.06e-01     1.04e+01     4.52e+02     2.84e+01
+equilibrium_temperature       8.20e+01     8.24e+02     2.43e+03     4.17e+02
+stellar_radius                1.15e-01     1.33e+00     4.55e+01     2.46e+00
+stellar_mass                  8.02e-02     9.09e-01     1.43e+01     5.75e-01
+
+============================================================
+SUMMARY: TESS TOI
+============================================================
+
+Total Records: 7,111
+
+Disposition Distribution:
+  CANDIDATE           :  5,240 ( 73.7%)
+  FALSE_POSITIVE      :  1,192 ( 16.8%)
+  CONFIRMED           :    679 (  9.5%)
+
+Feature Completeness (% non-null):
+  orbital_period           :  98.6%
+  transit_duration         : 100.0%
+  planetary_radius         :  93.5%
+  stellar_magnitude        : 100.0%
+  transit_depth            : 100.0%
+  impact_parameter         :   0.0%
+  equilibrium_temperature  :  96.3%
+  stellar_radius           :  93.5%
+  stellar_mass             :   0.0%
+  disposition_score        :   0.0%
+
+Feature Statistics (non-null values):
+Feature                            Min         Mean          Max          Std
+-------------------------------------------------------------------------
+orbital_period                1.64e-01     1.80e+01     1.84e+03     9.91e+01
+transit_duration              1.01e-01     3.11e+00     3.00e+01     1.87e+00
+planetary_radius              5.53e-01     1.02e+01     2.97e+02     8.62e+00
+stellar_magnitude             4.63e+00     1.16e+01     1.83e+01     1.62e+00
+transit_depth                 2.46e+01     8.11e+03     5.04e+05     1.53e+04
+equilibrium_temperature       3.70e+01     1.28e+03     6.41e+03     6.83e+02
+stellar_radius                1.15e-01     1.40e+00     1.02e+02     1.64e+00
