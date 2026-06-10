@@ -56,12 +56,16 @@ def validate_input_features(
         ...     print(f"Cannot predict: {msg}")
         ...     return disp  # Returns 'NO_PREDICT'
     """
-    # Define core features currently collected by the web form (5 required fields)
+    # Model's 9 features (from random_forest metadata)
     core_features = [
         'orbital_period',
         'transit_duration',
         'planetary_radius',
+        'transit_depth',
+        'impact_parameter',
         'equilibrium_temperature',
+        'insolation_flux',
+        'stellar_surface_gravity',
         'stellar_radius'
     ]
     
@@ -124,6 +128,8 @@ def check_feature_quality(
             'transit_depth': (0, 1000000),     # ppm
             'impact_parameter': (0, 2),        # dimensionless
             'equilibrium_temperature': (0, 10000),  # Kelvin
+            'insolation_flux': (0, 100000),    # Earth flux
+            'stellar_surface_gravity': (0, 6),  # log g (cgs)
             'stellar_radius': (0.1, 500),      # Solar radii
             'stellar_mass': (0.01, 100)        # Solar masses
         }
@@ -287,42 +293,6 @@ if __name__ == "__main__":
     print("Exoplanet Detection Utilities")
     print("=" * 60)
     print("\nDisposition Classes:")
-    for i, disp in enumerate(VALID_DISPOSITIONS, 1):
-        print(f"  {i}. {disp}")
-    
-    print("\n" + "=" * 60)
-    print("Example: Input Validation")
-    print("=" * 60)
-    
-    # Example 1: Insufficient data
-    insufficient_data = {
-        'orbital_period': 10.5
-    }
-    valid, disp, msg = validate_input_features(insufficient_data)
-    print(f"\nInput: {insufficient_data}")
-    print(f"Valid: {valid}")
-    print(f"Disposition: {disp}")
-    print(f"Message: {msg}")
-    
-    # Example 2: Sufficient data
-    sufficient_data = {
-        'orbital_period': 10.5,
-        'transit_duration': 3.2,
-        'planetary_radius': 2.5,
-        'stellar_magnitude': 12.3,
-        'transit_depth': 500.0
-    }
-    valid, disp, msg = validate_input_features(sufficient_data)
-    print(f"\nInput: {sufficient_data}")
-    print(f"Valid: {valid}")
-    print(f"Message: {msg}")
-    
-    # Example 3: Invalid feature values
-    invalid_data = {
-        'orbital_period': -5.0,  # Invalid: negative
-        'planetary_radius': 2.5
-    }
-    valid, msg = check_feature_quality(invalid_data)
-    print(f"\nInput: {invalid_data}")
-    print(f"Valid: {valid}")
-    print(f"Message: {msg}")
+    for disp in VALID_DISPOSITIONS:
+        print(f"  - {disp}")
+    print(f"\nTraining dispositions: {TRAINING_DISPOSITIONS}")

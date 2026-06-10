@@ -20,15 +20,31 @@ from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     confusion_matrix, classification_report, roc_auc_score, roc_curve
 )
-import xgboost as xgb
-from imblearn.over_sampling import SMOTE
 
-# Deep learning
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers, models, callbacks
+# Optional heavy dependencies (only needed for training)
+try:
+    import xgboost as xgb
+    HAS_XGBOOST = True
+except ImportError:
+    HAS_XGBOOST = False
+
+try:
+    from imblearn.over_sampling import SMOTE
+    HAS_SMOTE = True
+except ImportError:
+    HAS_SMOTE = False
+
+try:
+    import tensorflow as tf
+    from tensorflow import keras
+    from tensorflow.keras import layers, models, callbacks
+    HAS_TENSORFLOW = True
+except ImportError:
+    HAS_TENSORFLOW = False
 
 # Visualization
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -105,17 +121,17 @@ class ExoplanetClassifier:
         df = df[df['disposition'].isin(TRAINING_DISPOSITIONS)].copy()
         print(f"After filtering: {len(df):,} training samples")
         
-        # Define features to use
+        # Define features to use (must match deployed model metadata)
         self.feature_names = [
             'orbital_period',
             'transit_duration',
             'planetary_radius',
-            'stellar_magnitude',
             'transit_depth',
             'impact_parameter',
             'equilibrium_temperature',
-            'stellar_radius',
-            'stellar_mass'
+            'insolation_flux',
+            'stellar_surface_gravity',
+            'stellar_radius'
         ]
         
         # Extract features and target
@@ -181,6 +197,8 @@ class ExoplanetClassifier:
         
         # Handle class imbalance with SMOTE
         if use_smote:
+            if not HAS_SMOTE:
+                raise ImportError("imbalanced-learn is required for SMOTE. Install with: pip install imbalanced-learn")
             print("\nApplying SMOTE for class balancing...")
             print(f"  Before SMOTE: {len(X_train_scaled):,} samples")
             
@@ -215,8 +233,10 @@ class ExoplanetClassifier:
             verbose=1
         )
     
-    def build_xgboost(self) -> xgb.XGBClassifier:
+    def build_xgboost(self) -> 'xgb.XGBClassifier':
         """Build XGBoost classifier"""
+        if not HAS_XGBOOST:
+            raise ImportError("xgboost is required for this model type. Install with: pip install xgboost")
         print(f"\nBuilding XGBoost classifier...")
         return xgb.XGBClassifier(
             n_estimators=200,
@@ -229,8 +249,10 @@ class ExoplanetClassifier:
             eval_metric='mlogloss'
         )
     
-    def build_neural_network(self, input_dim: int, num_classes: int) -> keras.Model:
+    def build_neural_network(self, input_dim: int, num_classes: int) -> 'keras.Model':
         """Build Neural Network classifier"""
+        if not HAS_TENSORFLOW:
+            raise ImportError("tensorflow is required for this model type. Install with: pip install tensorflow")
         print(f"\nBuilding Neural Network...")
         print(f"  Input features: {input_dim}")
         print(f"  Output classes: {num_classes}")
