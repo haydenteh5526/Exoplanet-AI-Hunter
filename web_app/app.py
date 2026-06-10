@@ -438,3 +438,6 @@ if __name__ == '__main__':
     else:
         logger.error("Failed to load model. Run: python src/models.py")
         sys.exit(1)
+else:
+    # Load model when imported by gunicorn/wsgi
+    load_model()

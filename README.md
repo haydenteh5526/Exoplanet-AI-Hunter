@@ -23,6 +23,19 @@ python app.py
 # Open http://localhost:5000
 ```
 
+## Docker
+
+```bash
+docker compose up --build
+# Open http://localhost:5000
+```
+
+## Tests
+
+```bash
+pytest tests/ -v
+```
+
 ## Input Parameters
 
 The model accepts 9 astronomical observation parameters:

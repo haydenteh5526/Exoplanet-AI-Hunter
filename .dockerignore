@@ -1,0 +1,10 @@
+venv/
+.git/
+__pycache__/
+*.pyc
+data/raw/
+retrain.py
+tests/
+.gitignore
+README.md
+LICENSE

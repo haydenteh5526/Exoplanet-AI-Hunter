@@ -17,5 +17,7 @@
     "FALSE_POSITIVE"
   ],
   "timestamp": "2025-10-04T14:51:47",
-  "accuracy": 0.7366
+  "accuracy": 0.7358695652173913,
+  "n_samples": 18396,
+  "sklearn_version": "1.9.0"
 }
