@@ -2,13 +2,14 @@
 Exoplanet AI Hunter - Flask Web Application
 NASA Space Apps Challenge 2025
 
-This web application uses machine learning to classify astronomical observations
-as confirmed exoplanets, planetary candidates, or false positives.
+Classifies astronomical observations as confirmed exoplanets,
+planetary candidates, or false positives using Random Forest ML.
 """
 
 import os
 import sys
 import json
+import logging
 import pickle
 import numpy as np
 import pandas as pd
@@ -21,8 +22,8 @@ project_root = current_dir.parent
 sys.path.insert(0, str(project_root / 'src'))
 
 from utils import (
-    validate_input_features, 
-    check_feature_quality, 
+    validate_input_features,
+    check_feature_quality,
     prepare_prediction_input,
     format_prediction_result,
     DISPOSITION_CONFIRMED,
@@ -32,6 +33,18 @@ from utils import (
 )
 
 app = Flask(__name__)
+
+# Logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+logger = logging.getLogger(__name__)
+
+# CORS headers for API access
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    return response
 
 # Configuration constants
 DEFAULT_PORT = int(os.getenv('FLASK_PORT', 5000))
@@ -70,62 +83,62 @@ def load_model():
     global model, scaler, encoder, metadata, exoplanet_db
     
     try:
-        print("Loading model...")
+        logger.info("Loading model...")
         with open(MODEL_FILE, 'rb') as f:
             model = pickle.load(f)
-        print(f"  Model loaded: {MODEL_FILE}")
+        logger.info(f"  Model loaded: {MODEL_FILE}")
         
-        print("Loading scaler...")
+        logger.info("Loading scaler...")
         with open(SCALER_FILE, 'rb') as f:
             scaler = pickle.load(f)
-        print(f"  Scaler loaded: {SCALER_FILE}")
+        logger.info(f"  Scaler loaded: {SCALER_FILE}")
         
-        print("Loading encoder...")
+        logger.info("Loading encoder...")
         with open(ENCODER_FILE, 'rb') as f:
             encoder = pickle.load(f)
-        print(f"  Encoder loaded: {ENCODER_FILE}")
+        logger.info(f"  Encoder loaded: {ENCODER_FILE}")
         
-        print("Loading metadata...")
+        logger.info("Loading metadata...")
         with open(METADATA_FILE, 'r') as f:
             metadata = json.load(f)
-        print(f"  Metadata loaded: {METADATA_FILE}")
+        logger.info(f"  Metadata loaded: {METADATA_FILE}")
         
         # Load exoplanet database
-        print("Loading exoplanet database...")
+        logger.info("Loading exoplanet database...")
         dfs = []
         if KEPLER_DATA.exists():
             df = pd.read_csv(KEPLER_DATA)
             df['source'] = 'Kepler'
             dfs.append(df)
-            print(f"  Loaded {len(df)} Kepler exoplanets")
+            logger.info(f"  Loaded {len(df)} Kepler exoplanets")
         
         if K2_DATA.exists():
             df = pd.read_csv(K2_DATA)
             df['source'] = 'K2'
             dfs.append(df)
-            print(f"  Loaded {len(df)} K2 exoplanets")
+            logger.info(f"  Loaded {len(df)} K2 exoplanets")
         
         if TESS_DATA.exists():
             df = pd.read_csv(TESS_DATA)
             df['source'] = 'TESS'
             dfs.append(df)
-            print(f"  Loaded {len(df)} TESS exoplanets")
+            logger.info(f"  Loaded {len(df)} TESS exoplanets")
         
         if dfs:
             exoplanet_db = pd.concat(dfs, ignore_index=True)
-            print(f"  Total exoplanet database: {len(exoplanet_db)} entries")
+            logger.info(f"  Total exoplanet database: {len(exoplanet_db)} entries")
         else:
-            print("  WARNING: No exoplanet database files found")
+            logger.warning("No exoplanet database files found")
         
-        print("Model successfully loaded and ready!")
+        logger.info("Model ready!")
         return True
     
     except FileNotFoundError as e:
-        print(f"ERROR: Model file not found - {e}")
-        print("Please train a model first by running: python src/models.py")
+        logger.error(f"Model file not found: {e}")
+        logger.error("Train a model first: python src/models.py")
         return False
     except Exception as e:
-        print(f"ERROR loading model: {e}")
+        logger.error(f"Error loading model: {e}")
         return False
 
 
@@ -322,14 +335,8 @@ def predict():
             }), 500
         
         feature_array = []
-        
-        # Note: The model was trained with 9 features, but the form only collects 5.
-        # Missing features are filled with 0.0 as a placeholder.
-        # For optimal predictions, consider:
-        # 1. Retraining the model with only the 5 features, OR
-        # 2. Using median imputation based on training data statistics
         for feature in features:
-            value = input_data.get(feature, 0.0)  # Use 0.0 for missing features
+            value = input_data.get(feature, 0.0)
             if value is None:
                 value = 0.0
             feature_array.append(float(value))
@@ -384,16 +391,14 @@ def predict():
             response['matched_exoplanets'] = matches
             response['best_match'] = matches[0]  # Top match
         
-        print(f"Prediction successful: {predicted_class} ({confidence:.2%})")
+        logger.info(f"Prediction: {predicted_class} ({confidence:.2%})")
         if matches:
-            print(f"   Best match: {matches[0]['name']} ({matches[0]['similarity']:.1%} similarity)")
+            logger.info(f"  Best match: {matches[0]['name']} ({matches[0]['similarity']:.1%} similarity)")
         
         return jsonify(response)
     
     except Exception as e:
-        print(f"Prediction error: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.exception("Prediction error")
         
         return jsonify({
             'error': 'Prediction failed',
@@ -427,17 +432,9 @@ def feature_importance():
 
 
 if __name__ == '__main__':
-    print("\n" + "="*60)
-    print("EXOPLANET AI HUNTER - WEB APPLICATION")
-    print("="*60 + "\n")
-    
-    # Load model on startup
     if load_model():
-        print("\n" + "="*60)
-        print("Starting Flask server...")
-        print("="*60 + "\n")
+        logger.info(f"Starting server on {DEFAULT_HOST}:{DEFAULT_PORT}")
         app.run(debug=DEBUG_MODE, host=DEFAULT_HOST, port=DEFAULT_PORT)
     else:
-        print("\nFailed to load model. Please train a model first.")
-        print("Run: python src/models.py")
+        logger.error("Failed to load model. Run: python src/models.py")
         sys.exit(1)
