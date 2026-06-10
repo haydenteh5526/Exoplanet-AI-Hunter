@@ -3,8 +3,11 @@
 [![NASA Space Apps Challenge 2025](https://img.shields.io/badge/NASA-Space%20Apps%20Challenge%202025-blue)](https://spaceappschallenge.org/)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://python.org)
 [![Accuracy](https://img.shields.io/badge/Accuracy-73.7%25-brightgreen)](https://github.com)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-blueviolet)](https://exoplanet-ai-hunter.onrender.com)
 
-An AI-powered web application for classifying exoplanet observations from NASA's Kepler, K2, and TESS missions. Using a Random Forest model trained on 9,487 samples, this tool classifies observations as confirmed exoplanets, planetary candidates, or false positives.
+**[Live Demo →](https://exoplanet-ai-hunter.onrender.com)**
+
+An AI-powered web application for classifying exoplanet transit observations from NASA's Kepler, K2, and TESS missions. Using a Random Forest model trained on 9,487 samples, this tool triages observations as confirmed exoplanets, planetary candidates, or false positives — helping prioritize follow-up observations.
 
 ## Quick Start
 
