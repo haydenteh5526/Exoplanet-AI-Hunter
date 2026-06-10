@@ -211,3 +211,6 @@ models/*.png
 
 # Model run artifacts (large files)
 model_runs/
+
+# Reference repos (not part of this project)
+reference/

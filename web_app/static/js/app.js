@@ -72,6 +72,8 @@ document.getElementById('predictionForm').addEventListener('submit', async funct
         } else {
             displayResults(result);
         }
+        // Scroll to results
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (error) {
         displayError('Failed to connect to the server. Please try again.');
     } finally {

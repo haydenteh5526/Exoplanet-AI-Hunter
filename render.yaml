@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: exoplanet-ai-hunter
+    runtime: docker
+    plan: free
+    healthCheckPath: /

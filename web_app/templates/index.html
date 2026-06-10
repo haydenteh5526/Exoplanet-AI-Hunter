@@ -44,12 +44,12 @@
             <div class="hero-content">
                 <div class="badge animate-fadeInUp">NASA Space Apps Challenge 2025</div>
                 <h1 class="hero-title animate-fadeInUp" style="animation-delay: 0.1s">
-                    Hunting for<br>
-                    <span class="gradient-text">Exoplanets with AI</span>
+                    Classifying<br>
+                    <span class="gradient-text">Exoplanet Candidates with AI</span>
                 </h1>
                 <p class="hero-description animate-fadeInUp" style="animation-delay: 0.2s">
-                    Machine learning classifier trained on 9,487 observations from NASA's Kepler, K2, and TESS missions.
-                    Classifies astronomical observations as confirmed exoplanets, candidates, or false positives.
+                    Machine learning classifier that triages astronomical transit observations from NASA's Kepler, K2, and TESS missions.
+                    Trained on 9,487 labeled samples to distinguish confirmed exoplanets from false positives — helping prioritize follow-up observations.
                 </p>
                 <div class="hero-cta animate-fadeInUp" style="animation-delay: 0.3s">
                     <a href="#demo" class="btn btn-primary btn-lg smooth-scroll">
@@ -87,13 +87,68 @@
             </div>
         </section>
 
-        <!-- SECTION 2: Classification Demo -->
+        <!-- SECTION 2: What is Transit Detection -->
+        <section id="transit" class="features-section section-padding">
+            <div class="section-header">
+                <div class="badge">Background</div>
+                <h2 class="section-title">How Exoplanets Are Detected</h2>
+                <p class="section-description">
+                    Planets don't emit light, but stars do. When a planet passes in front of its star (a "transit"),
+                    it blocks a tiny fraction of starlight. By measuring this periodic dimming, we can infer the planet's existence and properties.
+                </p>
+            </div>
+
+            <div class="transit-diagram">
+                <div class="transit-steps">
+                    <div class="transit-step">
+                        <div class="transit-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="16" fill="#fbbf24" opacity="0.8"/>
+                                <circle cx="24" cy="24" r="12" fill="#f59e0b"/>
+                            </svg>
+                        </div>
+                        <h4>Star Only</h4>
+                        <p>Full brightness observed — no planet blocking the light</p>
+                    </div>
+                    <div class="transit-arrow">&#x2192;</div>
+                    <div class="transit-step">
+                        <div class="transit-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="16" fill="#fbbf24" opacity="0.8"/>
+                                <circle cx="24" cy="24" r="12" fill="#f59e0b"/>
+                                <circle cx="20" cy="22" r="5" fill="#1e1b4b"/>
+                            </svg>
+                        </div>
+                        <h4>Transit</h4>
+                        <p>Planet crosses the star — brightness dips by a measurable amount</p>
+                    </div>
+                    <div class="transit-arrow">&#x2192;</div>
+                    <div class="transit-step">
+                        <div class="transit-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="16" fill="#fbbf24" opacity="0.8"/>
+                                <circle cx="24" cy="24" r="12" fill="#f59e0b"/>
+                            </svg>
+                        </div>
+                        <h4>Post-Transit</h4>
+                        <p>Brightness returns — the depth and duration reveal planetary properties</p>
+                    </div>
+                </div>
+                <p class="transit-note">
+                    The <strong>transit depth</strong> tells us the planet's size. The <strong>orbital period</strong> is the time between transits.
+                    These are the key features our ML model uses for classification.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Classification Demo -->
         <section id="demo" class="demo-section section-padding">
             <div class="section-header">
                 <div class="badge">Live Demo</div>
-                <h2 class="section-title">Classify an Observation</h2>
+                <h2 class="section-title">Classify a Transit Observation</h2>
                 <p class="section-description">
-                    Enter astronomical parameters to get an AI-powered classification. The first 5 fields are required; additional fields improve accuracy.
+                    Enter transit parameters from a telescope observation to get an AI-powered triage classification.
+                    Helps determine if a candidate is likely a real exoplanet or a false positive.
                 </p>
             </div>
 
@@ -301,9 +356,9 @@
                             <line x1="12" y1="22.08" x2="12" y2="12"></line>
                         </svg>
                     </div>
-                    <h3 class="feature-title">3. Real-Time Inference</h3>
+                    <h3 class="feature-title">3. Candidate Triage</h3>
                     <p class="feature-description">
-                        Flask API serves predictions with confidence scores, plus similarity matching against 18,396 known exoplanets for context.
+                        Flask API classifies transit candidates with confidence scores, plus similarity matching against 18,396 known objects for context.
                     </p>
                 </div>
             </div>
