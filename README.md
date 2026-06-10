@@ -1,6 +1,7 @@
 # Exoplanet AI Hunter 🚀🪐
 
 [![NASA Space Apps Challenge 2025](https://img.shields.io/badge/NASA-Space%20Apps%20Challenge%202025-blue)](https://spaceappschallenge.org/)
+[![CI](https://github.com/haydenteh5526/Exoplanet-AI-Hunter/actions/workflows/ci.yml/badge.svg)](https://github.com/haydenteh5526/Exoplanet-AI-Hunter/actions)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://python.org)
 [![Accuracy](https://img.shields.io/badge/Accuracy-73.7%25-brightgreen)](https://github.com)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-blueviolet)](https://exoplanet-ai-hunter.onrender.com)
